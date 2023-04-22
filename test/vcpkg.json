@@ -1,0 +1,14 @@
+{
+  "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json",
+  "dependencies": [
+    {
+      "name": "catch2",
+      "version>=": "3.3.2"
+    },
+    {
+      "name": "yyjson",
+      "features": [ "fast-fp-conv" ]
+    }
+  ],
+  "builtin-baseline": "93e173a0d724c193e5546d48efb3e4ef47c1e1f2"
+}
