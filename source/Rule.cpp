@@ -285,88 +285,93 @@ void Rule::applyRule(TileGrid &tileGrid, const IntGrid &cells, const int randomS
          }
 
 #if !defined(NDEBUG) && LDTK_IMPORT_DEBUG_RULE > 0
-         uint8_t flag = static_cast<uint8_t>(ruleMatchResult) | breakOnMatchFlag;
          matchedCells.push_back(DebugMatchCell{ cellX, cellY, 0 });
 #endif
 
-         if (tileMode == TileMode::Single)
+         switch (tileMode)
          {
-            // choose one tile at random
-            tileid_t tileId;
-            if (tileIds.size() > 1)
+            case TileMode::Single:
             {
-               tileId = tileIds[GridUtility::getRandomIndex(randomSeed + uid, cellX, cellY, tileIds.size())];
-            }
-            else
-            {
-               tileId = tileIds[0];
-            }
-
-            uint8_t flags = static_cast<uint8_t>(ruleMatchResult) | breakOnMatchFlag;
-
-            tileGrid.putTile(tileId, cellX, cellY, flags, rulePriority);
-         }
-         else if (tileMode == TileMode::Stamp)
-         {
-            ASSERT(stampTileOffsets.size() == tileIds.size(),
-               "For Rule " << uid << ", stampTileOffsets size should match tileIds size at this point. stampTileOffsets.size(): " << stampTileOffsets.size() << " tileIds.size(): " << tileIds.size());
-
-            // go through each tile in the stamp
-            for (size_t tileIdx = 0, tileLen = tileIds.size(); tileIdx < tileLen; ++tileIdx)
-            {
-               Rule::Offset &offset = stampTileOffsets[tileIdx];
-
-               uint8_t flags;
-               if (offset.x == 0 && offset.y == 0 || !offset.hasAnyOffset())
+               // choose one tile at random
+               tileid_t tileId;
+               if (tileIds.size() > 1)
                {
-                  /// @todo to properly implement breakOnMatch for tiles that are not exactly on the matched cell,
-                  /// we'll need to check if there are no more transparent areas left in the cell
-                  flags = static_cast<uint8_t>(ruleMatchResult) | offset.flags | breakOnMatchFlag;
+                  tileId = tileIds[GridUtility::getRandomIndex(randomSeed + uid, cellX, cellY, tileIds.size())];
                }
                else
                {
-                  // do not finalize for cells that aren't the current one
-                  flags = static_cast<uint8_t>(ruleMatchResult) | offset.flags;
+                  tileId = tileIds[0];
                }
 
-               int locationX = cellX + (offset.x * (tile::isFlippedX(flags) ? -1 : 1));
-               int locationY = cellY + (offset.y * (tile::isFlippedY(flags) ? -1 : 1));
-               if (locationX < 0 || locationX > cells.getWidth() || locationY < 0 || locationY > cells.getHeight())
-               {
-                  // Tile of stamp went over the map, skip it.
-                  // It's ok if part of the stamp is cut-off,
-                  // since that part is effectively at off-screen area.
-                  continue;
-               }
+               uint8_t flags = static_cast<uint8_t>(ruleMatchResult) | breakOnMatchFlag;
 
-               // If we have left offset, check if (locationX-1, locationY) has a higher priority rule placed on it.
-               // If so, we need to move the tile there and switch the left offset to a right offset.
-               // Visually, it will be in the same position, it's just that we need to do this to properly
-               // enforce z-order, so that a higher priority rule shows up on top of this rule.
-               if (tile::hasOffsetLeft(flags) && locationX > 0 && tileGrid.getHighestPriority(locationX - 1, locationY) < rulePriority)
-               {
-                  --locationX;
-                  flags &= ~TILE_OFFSET_LEFT;
-                  flags |= TILE_OFFSET_RIGHT;
-               }
-
-               // Do the same in the Y-axis.
-               if (tile::hasOffsetUp(flags) && locationY > 0 && tileGrid.getHighestPriority(locationX, locationY - 1) < rulePriority)
-               {
-                  --locationY;
-                  flags &= ~TILE_OFFSET_UP;
-                  flags |= TILE_OFFSET_DOWN;
-               }
-
-               tileGrid.putTile(tileIds[tileIdx], locationX, locationY, flags, rulePriority);
+               tileGrid.putTile(tileId, cellX, cellY, flags, rulePriority);
+               break;
             }
-         }
-         else
-         {
-            ASSERT_THROW(false, std::runtime_error, "For Rule " << uid << ", unknown tileMode property. ");
-         }
-      }
-   }
+            case TileMode::Stamp:
+            {
+               ASSERT(stampTileOffsets.size() == tileIds.size(),
+                  "For Rule " << uid << ", stampTileOffsets size should match tileIds size at this point. stampTileOffsets.size(): " << stampTileOffsets.size() << " tileIds.size(): " << tileIds.size());
+
+               // go through each tile in the stamp
+               for (size_t tileIdx = 0, tileLen = tileIds.size(); tileIdx < tileLen; ++tileIdx)
+               {
+                  Rule::Offset &offset = stampTileOffsets[tileIdx];
+
+                  uint8_t flags;
+                  if ((offset.x == 0 && offset.y == 0) || !offset.hasAnyOffset())
+                  {
+                     /// @todo to properly implement breakOnMatch for tiles that are not exactly on the matched cell,
+                     /// we'll need to check if there are no more transparent areas left in the cell
+                     flags = static_cast<uint8_t>(ruleMatchResult) | offset.flags | breakOnMatchFlag;
+                  }
+                  else
+                  {
+                     // do not finalize for cells that aren't the current one
+                     flags = static_cast<uint8_t>(ruleMatchResult) | offset.flags;
+                  }
+
+                  int locationX = cellX + (offset.x * (tile::isFlippedX(flags) ? -1 : 1));
+                  int locationY = cellY + (offset.y * (tile::isFlippedY(flags) ? -1 : 1));
+                  if (locationX < 0 || locationX > cells.getWidth() || locationY < 0 || locationY > cells.getHeight())
+                  {
+                     // Tile of stamp went over the map, skip it.
+                     // It's ok if part of the stamp is cut-off,
+                     // since that part is effectively at off-screen area.
+                     continue;
+                  }
+
+                  // If we have left offset, check if (locationX-1, locationY) has a higher priority rule placed on it.
+                  // If so, we need to move the tile there and switch the left offset to a right offset.
+                  // Visually, it will be in the same position, it's just that we need to do this to properly
+                  // enforce z-order, so that a higher priority rule shows up on top of this rule.
+                  if (tile::hasOffsetLeft(flags) && locationX > 0 && tileGrid.getHighestPriority(locationX - 1, locationY) < rulePriority)
+                  {
+                     --locationX;
+                     flags &= ~TILE_OFFSET_LEFT;
+                     flags |= TILE_OFFSET_RIGHT;
+                  }
+
+                  // Do the same in the Y-axis.
+                  if (tile::hasOffsetUp(flags) && locationY > 0 && tileGrid.getHighestPriority(locationX, locationY - 1) < rulePriority)
+                  {
+                     --locationY;
+                     flags &= ~TILE_OFFSET_UP;
+                     flags |= TILE_OFFSET_DOWN;
+                  }
+
+                  tileGrid.putTile(tileIds[tileIdx], locationX, locationY, flags, rulePriority);
+               } // for tileId
+               break;
+            }
+            default:
+            {
+               ASSERT_THROW(false, std::runtime_error, "For Rule " << uid << ", unknown tileMode property. ");
+               break;
+            }
+         } // switch tileMode
+      } // for cellX
+   } // for cellY
 }
 
 } // namespace ldtkimport

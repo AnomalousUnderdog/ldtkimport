@@ -471,23 +471,23 @@ inline std::ostream &operator<<(std::ostream &os, const Rule &rule)
    {
       case Rule::CheckerMode::None:
          os << "Checker: None" << std::endl;
-      break;
+         break;
       case Rule::CheckerMode::Horizontal:
          os << "Checker: Horizontal" << std::endl;
-      break;
+         break;
       case Rule::CheckerMode::Vertical:
          os << "Checker: Vertical" << std::endl;
-      break;
+         break;
    }
    os << "Out-of-bounds: " << rule.verticalOutOfBoundsValue << std::endl;
-   switch(rule.tileMode)
+   switch (rule.tileMode)
    {
       case Rule::TileMode::Single:
          os << "Tile Mode: Single" << std::endl;
-      break;
+         break;
       case Rule::TileMode::Stamp:
          os << "Tile Mode: Stamp" << std::endl;
-      break;
+         break;
    }
    os << "Stamp Pivot X: " << rule.stampPivotX << std::endl;
    os << "Stamp Pivot Y: " << rule.stampPivotY << std::endl;

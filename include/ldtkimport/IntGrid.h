@@ -181,11 +181,17 @@ inline intgridvalue_t IntGrid::operator()(int x, int y) const
    return m_cells[GridUtility::getIndex(x, y, m_width)];
 }
 
+/**
+ * @brief Number of cells in the x-axis.
+ */
 inline dimensions_t IntGrid::getWidth() const
 {
    return m_width;
 }
 
+/**
+ * @brief Number of cells in the y-axis.
+ */
 inline dimensions_t IntGrid::getHeight() const
 {
    return m_height;

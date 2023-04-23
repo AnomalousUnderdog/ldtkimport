@@ -765,7 +765,7 @@ void LdtkDefFile::debugPrintRule(std::ostream &outStream, int ruleUid)
             }
 
             outStream << *rule << std::endl;
-            
+
          } // for Rule
       } // for RuleGroup
    } // for Layer

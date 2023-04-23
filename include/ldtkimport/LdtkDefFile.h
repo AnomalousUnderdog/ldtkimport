@@ -462,7 +462,7 @@ inline std::ostream &operator<<(std::ostream &os, const LdtkDefFile &ldtkFile)
             {
                continue;
             }
-            
+
             os << rule << std::endl;
          }
       }

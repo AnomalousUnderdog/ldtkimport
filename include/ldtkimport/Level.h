@@ -46,11 +46,17 @@ public:
       m_intGrid(idx) = value;
    }
 
+   /**
+    * @brief Number of cells in the x-axis.
+    */
    dimensions_t getWidth() const
    {
       return m_intGrid.getWidth();
    }
 
+   /**
+    * @brief Number of cells in the y-axis.
+    */
    dimensions_t getHeight() const
    {
       return m_intGrid.getHeight();
