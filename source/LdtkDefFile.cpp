@@ -2,6 +2,7 @@
 
 #include <climits>
 #include <cstring>
+#include <cmath>
 #include <fstream>
 #include <sstream>
 #include <iostream>
@@ -564,10 +565,10 @@ void LdtkDefFile::preProcess(bool preProcessDeactivatedContent)
 #endif
 
             // get stamp bounds (within the tilesheet's space)
-            int16_t top = _I16_MAX;
-            int16_t left = _I16_MAX;
-            int16_t right = _I16_MIN;
-            int16_t bottom = _I16_MIN;
+            int16_t top = SHRT_MAX;
+            int16_t left = SHRT_MAX;
+            int16_t right = SHRT_MIN;
+            int16_t bottom = SHRT_MIN;
             for (auto tileId = rule->tileIds.begin(), tileIdEnd = rule->tileIds.end(); tileId != tileIdEnd; ++tileId)
             {
                int16_t x, y;

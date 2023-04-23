@@ -110,6 +110,11 @@ public:
       return m_tileGrids[idx];
    }
 
+   const TileGrid &getTileGrid(int idx) const
+   {
+      return m_tileGrids[idx];
+   }
+
    friend std::ostream &operator<<(std::ostream &os, const Level &level);
 
    void debugPrintTileGrids(std::ostream &os) const;
