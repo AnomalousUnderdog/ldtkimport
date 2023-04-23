@@ -525,7 +525,7 @@ inline std::ostream &operator<<(std::ostream &os, const Rule &rule)
       }
    }
 
-   os << "TileId: [";
+   os << "TileId: " << rule.tileIds.size() << " [";
    for (size_t n = 0, len = rule.tileIds.size(); n < len; ++n)
    {
       os << rule.tileIds[n];
@@ -535,6 +535,13 @@ inline std::ostream &operator<<(std::ostream &os, const Rule &rule)
       }
    }
    os << "]" << std::endl;
+
+   os << "StampTileOffsets: " << rule.stampTileOffsets.size() << std::endl;
+   for (size_t n = 0, len = rule.stampTileOffsets.size(); n < len; ++n)
+   {
+      auto &stampTileOffset = rule.stampTileOffsets[n];
+      os << "  (" << stampTileOffset.x << ", " << stampTileOffset.y << ") " << +(stampTileOffset.flags) << std::endl;
+   }
 
 #if !defined(NDEBUG) && LDTK_IMPORT_DEBUG_RULE > 0
 
