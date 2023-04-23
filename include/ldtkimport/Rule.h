@@ -16,13 +16,6 @@
 namespace ldtkimport
 {
 
-static constexpr const char *RULE_CHECKER_MODE_NONE = "None";
-static constexpr const char *RULE_CHECKER_MODE_HORIZONTAL = "Horizontal";
-static constexpr const char *RULE_CHECKER_MODE_VERTICAL = "Vertical";
-
-static constexpr const char *TILE_MODE_SINGLE = "Single";
-static constexpr const char *TILE_MODE_STAMP = "Stamp";
-
 static const int RULE_PATTERN_ANYTHING = 1000001;
 static const int RULE_PATTERN_NOTHING = -1000001;
 
@@ -68,13 +61,13 @@ public:
       xModuloOffset(0),
       yModulo(0),
       yModuloOffset(0),
-      checker(RULE_CHECKER_MODE_NONE),
+      checker(CheckerMode::None),
       verticalOutOfBoundsValue(-1),
       horizontalOutOfBoundsValue(-1),
       pattern(),
       patternSize(0),
       tileIds(),
-      tileMode(TILE_MODE_SINGLE),
+      tileMode(TileMode::Single),
       stampPivotX(0.0f),
       stampPivotY(0.0f),
       stampTileOffsets()
@@ -184,19 +177,26 @@ public:
     */
    int yModuloOffset;
 
+   enum class CheckerMode
+   {
+      None,
+      Horizontal,
+      Vertical
+   };
+
    /**
     *  @brief Offset every other cell to check for.
     *
     *  Values can be:
-    *  RULE_CHECKER_MODE_NONE
-    *  RULE_CHECKER_MODE_HORIZONTAL
-    *  RULE_CHECKER_MODE_VERTICAL
+    *  CheckerMode::None
+    *  CheckerMode::Horizontal
+    *  CheckerMode::Vertical
     *
     *  When Checker Mode isn't None, we ignore xModuloOffset and/or yModuloOffset.
     *
     *  @see https://ldtk.io/json/#ldtk-AutoRuleDef;checker
     */
-   const char *checker;
+   CheckerMode checker;
 
    /**
     *  @brief When pattern checking for cells that are outside
@@ -309,12 +309,18 @@ public:
     */
    std::vector<tileid_t> tileIds;
 
+   enum class TileMode
+   {
+      Single,
+      Stamp
+   };
+
    /**
     *  @brief Determines how the tiles are displayed.
     *
     *  Values can be:
-    *  TILE_MODE_SINGLE
-    *  TILE_MODE_STAMP
+    *  TileMode::Single
+    *  TileMode::Stamp
     *
     *  Single: This rule will place only one tile into the cell that it matches.
     *          If there are many tiles specified in tileIds, then one is chosen at random.
@@ -328,7 +334,7 @@ public:
     *
     *  @see https://ldtk.io/json/#ldtk-AutoRuleDef;tileMode
     */
-   const char *tileMode;
+   TileMode tileMode;
 
    /**
     *  @brief When tileMode is Stamp, this is the X-position adjustment on
@@ -461,9 +467,28 @@ inline std::ostream &operator<<(std::ostream &os, const Rule &rule)
    os << "Modulo Y: " << rule.yModulo << std::endl;
    os << "Modulo X Offset: " << rule.xModuloOffset << std::endl;
    os << "Modulo Y Offset: " << rule.yModuloOffset << std::endl;
-   os << "Checker: " << rule.checker << std::endl;
+   switch (rule.checker)
+   {
+      case Rule::CheckerMode::None:
+         os << "Checker: None" << std::endl;
+      break;
+      case Rule::CheckerMode::Horizontal:
+         os << "Checker: Horizontal" << std::endl;
+      break;
+      case Rule::CheckerMode::Vertical:
+         os << "Checker: Vertical" << std::endl;
+      break;
+   }
    os << "Out-of-bounds: " << rule.verticalOutOfBoundsValue << std::endl;
-   os << "Tile Mode: " << rule.tileMode << std::endl;
+   switch(rule.tileMode)
+   {
+      case Rule::TileMode::Single:
+         os << "Tile Mode: Single" << std::endl;
+      break;
+      case Rule::TileMode::Stamp:
+         os << "Tile Mode: Stamp" << std::endl;
+      break;
+   }
    os << "Stamp Pivot X: " << rule.stampPivotX << std::endl;
    os << "Stamp Pivot Y: " << rule.stampPivotY << std::endl;
 

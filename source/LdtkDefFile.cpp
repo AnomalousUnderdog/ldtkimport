@@ -159,6 +159,13 @@ void LdtkDefFile::loadFromFile(const char *ldtkFile, bool loadDeactivatedContent
 const char *LAYER_TYPE_AUTO_LAYER = "AutoLayer";
 const char *LAYER_TYPE_INT_GRID = "IntGrid";
 
+const char *RULE_CHECKER_MODE_NONE = "None";
+const char *RULE_CHECKER_MODE_HORIZONTAL = "Horizontal";
+const char *RULE_CHECKER_MODE_VERTICAL = "Vertical";
+
+const char *TILE_MODE_SINGLE = "Single";
+const char *TILE_MODE_STAMP = "Stamp";
+
 void LdtkDefFile::loadFromText(const char *ldtkText, size_t textLength, bool loadDeactivatedContent, const char *filename)
 {
    auto ldtk_json = yyjson_read(ldtkText, textLength, 0);
@@ -353,35 +360,35 @@ void LdtkDefFile::loadFromText(const char *ldtkText, size_t textLength, bool loa
             auto checkerString = yyjson_obj_get_str(autoRule, "checker");
             if (std::strcmp(checkerString, RULE_CHECKER_MODE_NONE) == 0)
             {
-               newRule.checker = RULE_CHECKER_MODE_NONE;
+               newRule.checker = Rule::CheckerMode::None;
             }
             else if (std::strcmp(checkerString, RULE_CHECKER_MODE_HORIZONTAL) == 0)
             {
-               newRule.checker = RULE_CHECKER_MODE_HORIZONTAL;
+               newRule.checker = Rule::CheckerMode::Horizontal;
             }
             else if (std::strcmp(checkerString, RULE_CHECKER_MODE_VERTICAL) == 0)
             {
-               newRule.checker = RULE_CHECKER_MODE_VERTICAL;
+               newRule.checker = Rule::CheckerMode::Vertical;
             }
             else
             {
                // default to None if not recognized
-               newRule.checker = RULE_CHECKER_MODE_NONE;
+               newRule.checker = Rule::CheckerMode::None;
             }
 
             auto tileMode = yyjson_obj_get_str(autoRule, "tileMode");
             if (std::strcmp(tileMode, TILE_MODE_SINGLE) == 0)
             {
-               newRule.tileMode = TILE_MODE_SINGLE;
+               newRule.tileMode = Rule::TileMode::Single;
             }
             else if (std::strcmp(tileMode, TILE_MODE_STAMP) == 0)
             {
-               newRule.tileMode = TILE_MODE_STAMP;
+               newRule.tileMode = Rule::TileMode::Stamp;
             }
             else
             {
                // default to Single if not recognized
-               newRule.tileMode = TILE_MODE_SINGLE;
+               newRule.tileMode = Rule::TileMode::Single;
             }
 
             newRule.stampPivotX = yyjson_obj_get_float(autoRule, "pivotX");
@@ -540,7 +547,7 @@ void LdtkDefFile::preProcess(bool preProcessDeactivatedContent)
                continue;
             }
 
-            if (rule->tileMode != TILE_MODE_STAMP)
+            if (rule->tileMode != Rule::TileMode::Stamp)
             {
                // non-stamp rule, then we don't need to process the offsets
                continue;

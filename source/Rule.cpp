@@ -174,7 +174,7 @@ int8_t Rule::passesRule(const IntGrid &cells, const int cellX, const int cellY, 
 
    // modulo acts as a filter
    //
-   if (checker != RULE_CHECKER_MODE_VERTICAL && ((cellY - yModuloOffset) % yModulo) != 0)
+   if (checker != CheckerMode::Vertical && ((cellY - yModuloOffset) % yModulo) != 0)
    {
 #if !defined(NDEBUG) && LDTK_IMPORT_DEBUG_RULE > 1
       matchedCells.push_back(DebugMatchCell{ cellX, cellY, 0, std::string("Skipped due to Y Modulo") });
@@ -182,7 +182,7 @@ int8_t Rule::passesRule(const IntGrid &cells, const int cellX, const int cellY, 
       return RULE_FAIL;
    }
 
-   if (checker == RULE_CHECKER_MODE_VERTICAL && ((cellY + ((cellX / xModulo) % 2)) % yModulo) != 0)
+   if (checker == CheckerMode::Vertical && ((cellY + ((cellX / xModulo) % 2)) % yModulo) != 0)
    {
 #if !defined(NDEBUG) && LDTK_IMPORT_DEBUG_RULE > 1
       matchedCells.push_back(DebugMatchCell{ cellX, cellY, 0, std::string("Skipped due to Checker Y Modulo") });
@@ -190,7 +190,7 @@ int8_t Rule::passesRule(const IntGrid &cells, const int cellX, const int cellY, 
       return RULE_FAIL;
    }
 
-   if (checker != RULE_CHECKER_MODE_HORIZONTAL && ((cellX - xModuloOffset) % xModulo) != 0)
+   if (checker != CheckerMode::Horizontal && ((cellX - xModuloOffset) % xModulo) != 0)
    {
 #if !defined(NDEBUG) && LDTK_IMPORT_DEBUG_RULE > 1
       matchedCells.push_back(DebugMatchCell{ cellX, cellY, 0, std::string("Skipped due to X Modulo") });
@@ -198,7 +198,7 @@ int8_t Rule::passesRule(const IntGrid &cells, const int cellX, const int cellY, 
       return RULE_FAIL;
    }
 
-   if (checker == RULE_CHECKER_MODE_HORIZONTAL && ((cellX + ((cellY / yModulo) % 2)) % xModulo) != 0)
+   if (checker == CheckerMode::Horizontal && ((cellX + ((cellY / yModulo) % 2)) % xModulo) != 0)
    {
 #if !defined(NDEBUG) && LDTK_IMPORT_DEBUG_RULE > 1
       matchedCells.push_back(DebugMatchCell{ cellX, cellY, 0, std::string("Skipped due to Checker X Modulo") });
@@ -289,7 +289,7 @@ void Rule::applyRule(TileGrid &tileGrid, const IntGrid &cells, const int randomS
          matchedCells.push_back(DebugMatchCell{ cellX, cellY, 0 });
 #endif
 
-         if (tileMode == TILE_MODE_SINGLE)
+         if (tileMode == TileMode::Single)
          {
             // choose one tile at random
             tileid_t tileId;
@@ -306,7 +306,7 @@ void Rule::applyRule(TileGrid &tileGrid, const IntGrid &cells, const int randomS
 
             tileGrid.putTile(tileId, cellX, cellY, flags, rulePriority);
          }
-         else if (tileMode == TILE_MODE_STAMP)
+         else if (tileMode == TileMode::Stamp)
          {
             ASSERT(stampTileOffsets.size() == tileIds.size(),
                "For Rule " << uid << ", stampTileOffsets size should match tileIds size at this point. stampTileOffsets.size(): " << stampTileOffsets.size() << " tileIds.size(): " << tileIds.size());
@@ -363,7 +363,7 @@ void Rule::applyRule(TileGrid &tileGrid, const IntGrid &cells, const int randomS
          }
          else
          {
-            ASSERT_THROW(false, std::runtime_error, "For Rule " << uid << ", unknown tileMode property: " << tileMode);
+            ASSERT_THROW(false, std::runtime_error, "For Rule " << uid << ", unknown tileMode property. ");
          }
       }
    }
