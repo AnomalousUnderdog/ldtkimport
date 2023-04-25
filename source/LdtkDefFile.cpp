@@ -705,50 +705,56 @@ void LdtkDefFile::generate(Level &level, bool randomizeSeed)
 
    for (size_t layerIdx = 0, end = m_layers.size(); layerIdx < end; ++layerIdx)
    {
-      auto &layer = m_layers[layerIdx];
-      auto &tileGrid = level.getTileGrid(layerIdx);
+      generate(level, layerIdx, randomizeSeed);
+   } // for Layer
+}
 
-      if (randomizeSeed)
+void LdtkDefFile::generate(Level &level, size_t layerIdx, bool randomizeSeed)
+{
+   auto &intGrid = level.getIntGrid();
+   auto &layer = m_layers[layerIdx];
+   auto &tileGrid = level.getTileGrid(layerIdx);
+
+   if (randomizeSeed)
+   {
+      layer.randomSeed = rand();
+   }
+
+   tileGrid.setLayerUid(layer.uid);
+
+   uint8_t rulePriority = 0;
+
+   for (auto ruleGroup = layer.ruleGroups.begin(), ruleGroupEnd = layer.ruleGroups.end(); ruleGroup != ruleGroupEnd; ++ruleGroup)
+   {
+      if (!ruleGroup->active)
       {
-         layer.randomSeed = rand();
+         continue;
       }
 
-      tileGrid.setLayerUid(layer.uid);
-
-      uint8_t rulePriority = 0;
-
-      for (auto ruleGroup = layer.ruleGroups.begin(), ruleGroupEnd = layer.ruleGroups.end(); ruleGroup != ruleGroupEnd; ++ruleGroup)
+      for (auto rule = ruleGroup->rules.begin(), ruleEnd = ruleGroup->rules.end(); rule != ruleEnd; ++rule)
       {
-         if (!ruleGroup->active)
+         if (!rule->active)
          {
             continue;
          }
 
-         for (auto rule = ruleGroup->rules.begin(), ruleEnd = ruleGroup->rules.end(); rule != ruleEnd; ++rule)
+         if (rule->tileIds.size() == 0)
          {
-            if (!rule->active)
-            {
-               continue;
-            }
+            // no tiles for this rule, no point in processing
+            continue;
+         }
 
-            if (rule->tileIds.size() == 0)
-            {
-               // no tiles for this rule, no point in processing
-               continue;
-            }
+         if (rule->chance <= 0)
+         {
+            // no chance for this rule to occur, no point in processing
+            continue;
+         }
 
-            if (rule->chance <= 0)
-            {
-               // no chance for this rule to occur, no point in processing
-               continue;
-            }
+         rule->applyRule(tileGrid, intGrid, layer.randomSeed, rulePriority);
 
-            rule->applyRule(tileGrid, intGrid, layer.randomSeed, rulePriority);
-
-            ++rulePriority;
-         } // for Rule
-      } // for RuleGroup
-   } // for Layer
+         ++rulePriority;
+      } // for Rule
+   } // for RuleGroup
 }
 
 void LdtkDefFile::debugPrintRule(std::ostream &outStream, int ruleUid)

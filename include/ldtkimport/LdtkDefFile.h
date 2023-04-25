@@ -84,6 +84,16 @@ public:
    void generate(Level &level, bool randomizeSeed = false);
 
    /**
+    *  @brief Populate a layer of a level's TileGrids by letting this LdtkDefFile run its Rules through it.
+    *
+    *  @param[out] level Where output of rule matching process is placed onto.
+    *  @param[in] layerIdx Which layer's rules to run.
+    *  @param[in] randomizeSeed Set to true to give a new random seed to each layer,
+    *                           creating a new variation for the randomized parts.
+    */
+   void generate(Level &level, size_t layerIdx, bool randomizeSeed = false);
+
+   /**
     *  @brief Find a TileSet with the given unique id.
     *  @param[in] tilesetDefUid Unique id of the TileSet to get.
     *  @param[out] result Where the found TileSet will be in, if any. Use the return value to check.
