@@ -21,7 +21,7 @@ struct Layer
    Layer() :
       name(),
       uid(0),
-      gridSize(0),
+      cellPixelSize(0),
       tilesetDefUid(0),
       useAutoSourceLayerDefUid(false),
       autoSourceLayerDefUid(-1),
@@ -52,7 +52,7 @@ struct Layer
     *
     *  @see https://ldtk.io/json/#ldtk-LayerDefJson;gridSize
     */
-   dimensions_t gridSize;
+   dimensions_t cellPixelSize;
 
    /**
     *  @brief Which tilesheet to use for this layer, referred to by their unique identifier.

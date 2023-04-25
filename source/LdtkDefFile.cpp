@@ -262,7 +262,7 @@ void LdtkDefFile::loadFromText(const char *ldtkText, size_t textLength, bool loa
 
       newLayer.name = yyjson_obj_get_str(layer, "identifier");
       newLayer.uid = yyjson_obj_get_int(layer, "uid");
-      newLayer.gridSize = yyjson_obj_get_int(layer, "gridSize");
+      newLayer.cellPixelSize = yyjson_obj_get_int(layer, "gridSize");
       newLayer.tilesetDefUid = yyjson_obj_get_int(layer, "tilesetDefUid");
 
       auto layerAutoSourceLayerDefUid = yyjson_obj_get(layer, "autoSourceLayerDefUid");
