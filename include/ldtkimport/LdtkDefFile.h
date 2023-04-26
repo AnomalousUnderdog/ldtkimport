@@ -439,7 +439,7 @@ inline std::ostream &operator<<(std::ostream &os, const LdtkDefFile &ldtkFile)
 
       os << "Layer " << layerIdx << ": (" << layer.uid << ") \"" << layer.name << "\"" << std::endl;
       os << "  cellPixelSize: " << layer.cellPixelSize << std::endl;
-      os << "  randomSeed: " << layer.randomSeed << std::endl;
+      os << "  initialRandomSeed: " << layer.initialRandomSeed << std::endl;
 
       const ldtkimport::TileSet *tileset = nullptr;
       if (ldtkFile.getTileset(layer.tilesetDefUid, tileset))

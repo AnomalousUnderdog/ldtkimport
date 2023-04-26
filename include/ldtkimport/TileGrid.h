@@ -206,6 +206,16 @@ public:
       }
    }
 
+   void setRandomSeed(uint32_t newRandomSeed)
+   {
+      randomSeed = newRandomSeed;
+   }
+
+   uint32_t getRandomSeed() const
+   {
+      return randomSeed;
+   }
+
    friend std::ostream &operator<<(std::ostream &os, const TileGrid &tileGrid);
 
 private:
@@ -214,6 +224,13 @@ private:
     *  @brief Which Layer this TileGrid corresponds to.
     */
    uid_t m_layerUid;
+
+   /**
+    *  @brief Random seed that was used during the rule matching process.
+    *  This is stored in case later on, if you want to serialize the generated level
+    *  so that it can be recreated later on.
+    */
+   uint32_t randomSeed;
 
    dimensions_t m_width;
    dimensions_t m_height;

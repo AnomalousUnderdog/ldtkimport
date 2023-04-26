@@ -25,7 +25,7 @@ struct Layer
       tilesetDefUid(0),
       useAutoSourceLayerDefUid(false),
       autoSourceLayerDefUid(-1),
-      randomSeed(0),
+      initialRandomSeed(0),
       intGridValues(),
       ruleGroups()
    {
@@ -83,7 +83,7 @@ struct Layer
     *
     *  @see https://ldtk.io/json/#ldtk-LayerInstanceJson;seed
     */
-   uint32_t randomSeed;
+   uint32_t initialRandomSeed;
 
    /**
     *  @see https://ldtk.io/json/#ldtk-LayerDefJson;intGridValues

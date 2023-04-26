@@ -55,7 +55,7 @@ void LdtkDefFile::setLayerInitialSeed(int layerDefUid, int newInitialSeed)
    {
       if (m_layers[layerIdx].uid == layerDefUid)
       {
-         m_layers[layerIdx].randomSeed = newInitialSeed;
+         m_layers[layerIdx].initialRandomSeed = newInitialSeed;
          return;
       }
    }
@@ -269,7 +269,7 @@ void LdtkDefFile::loadFromText(const char *ldtkText, size_t textLength, bool loa
       newLayer.useAutoSourceLayerDefUid = !yyjson_is_null(layerAutoSourceLayerDefUid);
       newLayer.autoSourceLayerDefUid = yyjson_get_int(layerAutoSourceLayerDefUid);
 
-      newLayer.randomSeed = 0;
+      newLayer.initialRandomSeed = 0;
 
       auto intGridValues = yyjson_obj_get(layer, "intGridValues");
       size_t intGridValuesIdx, intGridValuesLen;
@@ -717,7 +717,11 @@ void LdtkDefFile::generate(Level &level, size_t layerIdx, bool randomizeSeed) co
 
    if (randomizeSeed)
    {
-      layer.randomSeed = rand();
+      tileGrid.setRandomSeed(rand());
+   }
+   else
+   {
+      tileGrid.setRandomSeed(layer.initialRandomSeed);
    }
 
    tileGrid.setLayerUid(layer.uid);
@@ -750,7 +754,7 @@ void LdtkDefFile::generate(Level &level, size_t layerIdx, bool randomizeSeed) co
             continue;
          }
 
-         rule->applyRule(tileGrid, intGrid, layer.randomSeed, rulePriority);
+         rule->applyRule(tileGrid, intGrid, tileGrid.getRandomSeed(), rulePriority);
 
          ++rulePriority;
       } // for Rule
