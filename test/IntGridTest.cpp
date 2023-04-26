@@ -1,10 +1,10 @@
-#include "ldtkimport/IntGrid.h"
-
 #include <vector>
 
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/matchers/catch_matchers_exception.hpp>
 #include <catch2/matchers/catch_matchers_string.hpp>
+
+#include "ldtkimport/IntGrid.h"
 
 using Catch::Matchers::ContainsSubstring;
 using namespace ldtkimport;

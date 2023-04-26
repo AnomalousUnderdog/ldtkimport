@@ -19,7 +19,7 @@ bool Rule::matchesCell(
 #if !defined(NDEBUG) && LDTK_IMPORT_DEBUG_RULE > 1
    std::ostream &debugLog,
 #endif
-   const IntGrid &cells, const int cellX, const int cellY, const int8_t directionX, const int8_t directionY, const int randomSeed)
+   const IntGrid &cells, const int cellX, const int cellY, const int8_t directionX, const int8_t directionY, const int randomSeed) const
 {
    // based on https://github.com/deepnight/ldtk/blob/08b91171913fe816c6ad8a09630c586ad63e174b/src/electron.renderer/data/def/AutoLayerRuleDef.hx#L248
 
@@ -168,7 +168,7 @@ static const int8_t RULE_FAIL = -1;
 static const int8_t RULE_SUCCESS_NORMAL = 0;
 
 
-int8_t Rule::passesRule(const IntGrid &cells, const int cellX, const int cellY, const int randomSeed)
+int8_t Rule::passesRule(const IntGrid &cells, const int cellX, const int cellY, const int randomSeed) const
 {
    // based on https://github.com/deepnight/ldtk/blob/08b91171913fe816c6ad8a09630c586ad63e174b/src/electron.renderer/data/inst/LayerInstance.hx#L720
 
@@ -254,7 +254,7 @@ int8_t Rule::passesRule(const IntGrid &cells, const int cellX, const int cellY, 
    return RULE_FAIL;
 }
 
-void Rule::applyRule(TileGrid &tileGrid, const IntGrid &cells, const int randomSeed, const uint8_t rulePriority)
+void Rule::applyRule(TileGrid &tileGrid, const IntGrid &cells, const int randomSeed, const uint8_t rulePriority) const
 {
    if (tileIds.size() == 0)
    {
@@ -316,7 +316,7 @@ void Rule::applyRule(TileGrid &tileGrid, const IntGrid &cells, const int randomS
                // go through each tile in the stamp
                for (size_t tileIdx = 0, tileLen = tileIds.size(); tileIdx < tileLen; ++tileIdx)
                {
-                  Rule::Offset &offset = stampTileOffsets[tileIdx];
+                  const Rule::Offset &offset = stampTileOffsets[tileIdx];
 
                   uint8_t flags;
                   if ((offset.x == 0 && offset.y == 0) || !offset.hasAnyOffset())

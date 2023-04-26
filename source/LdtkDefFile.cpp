@@ -687,7 +687,7 @@ void LdtkDefFile::preProcess(bool preProcessDeactivatedContent)
    } // for Layer
 }
 
-void LdtkDefFile::generate(Level &level, bool randomizeSeed)
+void LdtkDefFile::generate(Level &level, bool randomizeSeed) const
 {
    auto &intGrid = level.getIntGrid();
 
@@ -709,7 +709,7 @@ void LdtkDefFile::generate(Level &level, bool randomizeSeed)
    } // for Layer
 }
 
-void LdtkDefFile::generate(Level &level, size_t layerIdx, bool randomizeSeed)
+void LdtkDefFile::generate(Level &level, size_t layerIdx, bool randomizeSeed) const
 {
    auto &intGrid = level.getIntGrid();
    auto &layer = m_layers[layerIdx];
@@ -757,7 +757,7 @@ void LdtkDefFile::generate(Level &level, size_t layerIdx, bool randomizeSeed)
    } // for RuleGroup
 }
 
-void LdtkDefFile::debugPrintRule(std::ostream &outStream, int ruleUid)
+void LdtkDefFile::debugPrintRule(std::ostream &outStream, int ruleUid) const
 {
    for (auto layer = m_layers.cbegin(), layerEnd = m_layers.cend(); layer != layerEnd; ++layer)
    {

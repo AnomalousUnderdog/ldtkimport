@@ -27,7 +27,7 @@ using tiles_t = std::vector<TileInCell>;
  *
  *  Unlike IntGrid, which defines what "type" of thing is in the cell,
  *  a TileGrid only defines what is visually displayed in the cell.
- * 
+ *
  *  TileGrid allows stacking of tiles in one cell.
  *
  *  The values here are basically tiles that have been placed down after Rules are applied.

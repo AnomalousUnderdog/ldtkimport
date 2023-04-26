@@ -18,6 +18,9 @@
 namespace ldtkimport
 {
 
+using layers_t = std::vector<Layer>;
+using tilesets_t = std::vector<TileSet>;
+
 /**
  *  @brief Main class that holds together the definitions part of an LDtk file.
  *
@@ -72,7 +75,7 @@ public:
     *  @brief Prints the contents of a particular Rule to the out stream.
     *  Use std::cout to print it immediately, or a std::ostringstream if you want it as a string.
     */
-   void debugPrintRule(std::ostream &outStream, int ruleUid);
+   void debugPrintRule(std::ostream &outStream, int ruleUid) const;
 
    /**
     *  @brief Populate a level's TileGrids by letting this LdtkDefFile run its Rules through it.
@@ -81,7 +84,7 @@ public:
     *  @param[in] randomizeSeed Set to true to give a new random seed to each layer,
     *                           creating a new variation for the randomized parts.
     */
-   void generate(Level &level, bool randomizeSeed = false);
+   void generate(Level &level, bool randomizeSeed = false) const;
 
    /**
     *  @brief Populate a layer of a level's TileGrids by letting this LdtkDefFile run its Rules through it.
@@ -91,7 +94,7 @@ public:
     *  @param[in] randomizeSeed Set to true to give a new random seed to each layer,
     *                           creating a new variation for the randomized parts.
     */
-   void generate(Level &level, size_t layerIdx, bool randomizeSeed = false);
+   void generate(Level &level, size_t layerIdx, bool randomizeSeed = false) const;
 
    /**
     *  @brief Find a TileSet with the given unique id.
@@ -115,17 +118,17 @@ public:
    // By going through each Layer, each RuleGroup, each Rule,
    // and each TileId used by the Rule.
 
-   size_t getLayerCount()
+   size_t getLayerCount() const
    {
       return m_layers.size();
    }
 
-   const Layer &getLayer(int layerIdx)
+   const Layer &getLayer(int layerIdx) const
    {
       return m_layers[layerIdx];
    }
 
-   size_t getRuleGroupCount(int layerIdx)
+   size_t getRuleGroupCount(int layerIdx) const
    {
       if (layerIdx < 0 || layerIdx >= m_layers.size())
       {
@@ -134,7 +137,7 @@ public:
       return m_layers[layerIdx].ruleGroups.size();
    }
 
-   size_t getRuleCount(int layerIdx, int ruleGroupIdx)
+   size_t getRuleCount(int layerIdx, int ruleGroupIdx) const
    {
       if (layerIdx < 0 || layerIdx >= m_layers.size())
       {
@@ -147,7 +150,7 @@ public:
       return m_layers[layerIdx].ruleGroups[ruleGroupIdx].rules.size();
    }
 
-   size_t getRuleTileIdCount(int layerIdx, int ruleGroupIdx, int ruleIdx)
+   size_t getRuleTileIdCount(int layerIdx, int ruleGroupIdx, int ruleIdx) const
    {
       if (layerIdx < 0 || layerIdx >= m_layers.size())
       {
@@ -165,7 +168,7 @@ public:
       return m_layers[layerIdx].ruleGroups[ruleGroupIdx].rules[ruleIdx].tileIds.size();
    }
 
-   const char *getLayerName(int layerIdx)
+   const char *getLayerName(int layerIdx) const
    {
       if (layerIdx < 0 || layerIdx >= m_layers.size())
       {
@@ -175,7 +178,7 @@ public:
       return m_layers[layerIdx].name.c_str();
    }
 
-   const char *getRuleGroupName(int layerIdx, int ruleGroupIdx)
+   const char *getRuleGroupName(int layerIdx, int ruleGroupIdx) const
    {
       if (layerIdx < 0 || layerIdx >= m_layers.size())
       {
@@ -189,7 +192,7 @@ public:
       return m_layers[layerIdx].ruleGroups[ruleGroupIdx].name.c_str();
    }
 
-   std::pair<bool, uid_t> getRuleUid(int layerIdx, int ruleGroupIdx, int ruleIdx)
+   std::pair<bool, uid_t> getRuleUid(int layerIdx, int ruleGroupIdx, int ruleIdx) const
    {
       if (layerIdx < 0 || layerIdx >= m_layers.size())
       {
@@ -209,7 +212,7 @@ public:
       return std::make_pair(true, ruleUid);
    }
 
-   std::pair<bool, tileid_t> getRuleTileId(int layerIdx, int ruleGroupIdx, int ruleIdx, int tileIdIdx)
+   std::pair<bool, tileid_t> getRuleTileId(int layerIdx, int ruleGroupIdx, int ruleIdx, int tileIdIdx) const
    {
       if (layerIdx < 0 || layerIdx >= m_layers.size())
       {
@@ -244,101 +247,6 @@ public:
    {
       return m_bgColorf;
    }
-
-private:
-   // ---------------------------------------------------------------------
-
-   using layers_t = std::vector<Layer>;
-   using tilesets_t = std::vector<TileSet>;
-
-   /**
-    *  @brief Filename of the LdtkDefFile that was loaded.
-    *  Not strictly needed, only for debugging/informational purposes.
-    */
-   std::string m_filename;
-
-   /**
-    *  @brief https://ldtk.io/json/#ldtk-ProjectJson;iid
-    */
-   std::string m_projectUniqueId;
-
-   /**
-    *  @brief https://ldtk.io/json/#ldtk-ProjectJson;jsonVersion
-    */
-   std::string m_fileVersion;
-
-   /**
-    *  @brief Normally, Background Color resides in the LdtkDefFile's "Level" section.
-    *  But since we dynamically generate our own levels, we don't bother storing levels from the file.
-    *  The problem is that level designers usually assign the Bg Color from the level,
-    *  so we store the first level's Bg Color here.
-    */
-   std::string m_bgColor;
-
-   /**
-    *  @brief Color8 (8-bit integers) representation of the Bg Color.
-    *  @see m_bgColor
-    */
-   Color8 m_bgColor8;
-
-   /**
-    *  @brief Colorf (float with values 0.0 to 1.0) representation of the Bg Color.
-    *  @see m_bgColor
-    */
-   Colorf m_bgColorf;
-
-   /**
-    *  @brief List of all layers in the file.
-    *  The order here is the z-order when drawn (first layer should be visually on top).
-    *
-    *  @see https://ldtk.io/json/#ldtk-DefinitionsJson;layers
-    */
-   layers_t m_layers;
-
-   /**
-    *  @brief Info on the images used for the tiles.
-    *
-    *  @see https://ldtk.io/json/#ldtk-DefinitionsJson;tilesets
-    */
-   tilesets_t m_tilesets;
-
-   /**
-    *  @brief Assigns the random seed property to a layer definition.
-    *
-    *  Normally, the random seed is stored in the level's layer instances.
-    *  But since we dynamically generate levels, we don't bother with
-    *  layer instances.
-    *
-    *  So loadFromFile() will still parse through layer instances,
-    *  and we use this function to store the random seed for the layer.
-    *
-    *  @param[in] layerDefUid Unique id of the Layer to edit.
-    *  @param[in] newInitialSeed Random seed value for the Layer.
-    */
-   void setLayerInitialSeed(int layerDefUid, int newInitialSeed);
-
-   /**
-    *  @brief Find a Layer with the given unique id.
-    *  @param[in] layerDefUid Unique id of the Layer to get.
-    *  @param[out] result Where the found Layer will be in, if any. Use the return value to check.
-    *  @return true means the Layer was found, false if not.
-    */
-   bool getLayer(int layerDefUid, Layer *&result);
-
-   /**
-    *  @brief This computes certain values that will be cached, so that
-    *  they wouldn't have to be computed over and over every time you generate a new level.
-    *  Particularly, this caches the offsets for each tile to be used in a tile stamp.
-    *
-    *  This is automatically called in loadFromText.
-    *
-    *  @param[in] preProcessDeactivatedContent Whether or not we also compute cache for deactivated
-    *  RuleGroups and Rules. Some level designers have tests/experiments that they keep
-    *  deactivated, so you might not want to bother with those.
-    */
-   void preProcess(bool preProcessDeactivatedContent = false);
-
-public:
 
    // ---------------------------------------------------------------------
    // Functions to iterate through layers
@@ -415,6 +323,99 @@ public:
    {
       return m_tilesets.cend();
    }
+
+private:
+
+   // ---------------------------------------------------------------------
+
+   /**
+    *  @brief Assigns the random seed property to a layer definition.
+    *
+    *  Normally, the random seed is stored in the level's layer instances.
+    *  But since we dynamically generate levels, we don't bother with
+    *  layer instances.
+    *
+    *  So loadFromFile() will still parse through layer instances,
+    *  and we use this function to store the random seed for the layer.
+    *
+    *  @param[in] layerDefUid Unique id of the Layer to edit.
+    *  @param[in] newInitialSeed Random seed value for the Layer.
+    */
+   void setLayerInitialSeed(int layerDefUid, int newInitialSeed);
+
+   /**
+    *  @brief Find a Layer with the given unique id.
+    *  @param[in] layerDefUid Unique id of the Layer to get.
+    *  @param[out] result Where the found Layer will be in, if any. Use the return value to check.
+    *  @return true means the Layer was found, false if not.
+    */
+   bool getLayer(int layerDefUid, Layer *&result);
+
+   /**
+    *  @brief This computes certain values that will be cached, so that
+    *  they wouldn't have to be computed over and over every time you generate a new level.
+    *  Particularly, this caches the offsets for each tile to be used in a tile stamp.
+    *
+    *  This is automatically called in loadFromText.
+    *
+    *  @param[in] preProcessDeactivatedContent Whether or not we also compute cache for deactivated
+    *  RuleGroups and Rules. Some level designers have tests/experiments that they keep
+    *  deactivated, so you might not want to bother with those.
+    */
+   void preProcess(bool preProcessDeactivatedContent = false);
+
+   // ---------------------------------------------------------------------
+
+   /**
+    *  @brief Filename of the LdtkDefFile that was loaded.
+    *  Not strictly needed, only for debugging/informational purposes.
+    */
+   std::string m_filename;
+
+   /**
+    *  @brief https://ldtk.io/json/#ldtk-ProjectJson;iid
+    */
+   std::string m_projectUniqueId;
+
+   /**
+    *  @brief https://ldtk.io/json/#ldtk-ProjectJson;jsonVersion
+    */
+   std::string m_fileVersion;
+
+   /**
+    *  @brief Normally, Background Color resides in the LdtkDefFile's "Level" section.
+    *  But since we dynamically generate our own levels, we don't bother storing levels from the file.
+    *  The problem is that level designers usually assign the Bg Color from the level,
+    *  so we store the first level's Bg Color here.
+    */
+   std::string m_bgColor;
+
+   /**
+    *  @brief Color8 (8-bit integers) representation of the Bg Color.
+    *  @see m_bgColor
+    */
+   Color8 m_bgColor8;
+
+   /**
+    *  @brief Colorf (float with values 0.0 to 1.0) representation of the Bg Color.
+    *  @see m_bgColor
+    */
+   Colorf m_bgColorf;
+
+   /**
+    *  @brief List of all layers in the file.
+    *  The order here is the z-order when drawn (first layer should be visually on top).
+    *
+    *  @see https://ldtk.io/json/#ldtk-DefinitionsJson;layers
+    */
+   layers_t m_layers;
+
+   /**
+    *  @brief Info on the images used for the tiles.
+    *
+    *  @see https://ldtk.io/json/#ldtk-DefinitionsJson;tilesets
+    */
+   tilesets_t m_tilesets;
 
    // ---------------------------------------------------------------------
 };

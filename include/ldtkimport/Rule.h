@@ -86,7 +86,7 @@ public:
     *                          visually be on top of other tiles (that are placed by other rules) on the same cell.
     *                          Lower values have higher priority. Starts at 0 (highest priority).
     */
-   void applyRule(TileGrid &tileGrid, const IntGrid &cells, const int randomSeed, const uint8_t rulePriority);
+   void applyRule(TileGrid &tileGrid, const IntGrid &cells, const int randomSeed, const uint8_t rulePriority) const;
 
    /**
     *  @brief Unique identifier for this rule. Also contributes to the seed in pseudo-random number checks.
@@ -390,7 +390,7 @@ public:
        */
       uint8_t flags;
 
-      bool hasAnyOffset()
+      bool hasAnyOffset() const
       {
          return tile::hasOffsetLeft(flags) || tile::hasOffsetUp(flags);
       }
@@ -437,7 +437,7 @@ private:
 #if !defined(NDEBUG) && LDTK_IMPORT_DEBUG_RULE > 1
       std::ostream &debugLog,
 #endif
-      const IntGrid &cells, const int cellX, const int cellY, const int8_t directionX, const int8_t directionY, const int randomSeed);
+      const IntGrid &cells, const int cellX, const int cellY, const int8_t directionX, const int8_t directionY, const int randomSeed) const;
 
    /**
     *  @brief Check if this Rule matches the given cell coordinates.
@@ -452,7 +452,7 @@ private:
     *          The flag will also indicate if it was the horizontally and/or vertically flipped version
     *          of the Rule that matched, if ever.
     */
-   int8_t passesRule(const IntGrid &cells, const int cellX, const int cellY, const int randomSeed);
+   int8_t passesRule(const IntGrid &cells, const int cellX, const int cellY, const int randomSeed) const;
 };
 
 inline std::ostream &operator<<(std::ostream &os, const Rule &rule)
