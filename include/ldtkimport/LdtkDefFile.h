@@ -78,6 +78,13 @@ public:
    void debugPrintRule(std::ostream &outStream, int ruleUid) const;
 
    /**
+    *  @brief Ensure the given level has correct data to allow this LdtkDefFile to run its rules on it.
+    *  @param[out] level The level that will be checked.
+    *  @return true if rule matching process can proceed, false if not (most likely the level has no width/height).
+    */
+   bool ensureValidForGenerate(Level &level) const;
+
+   /**
     *  @brief Populate a level's TileGrids by letting this LdtkDefFile run its Rules through it.
     *
     *  @param[out] level Where output of rule matching process is placed onto.

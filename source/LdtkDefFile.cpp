@@ -709,6 +709,26 @@ void LdtkDefFile::generate(Level &level, bool randomizeSeed) const
    } // for Layer
 }
 
+bool LdtkDefFile::ensureValidForGenerate(Level &level) const
+{
+   auto &intGrid = level.getIntGrid();
+
+   // we don't really have a limit on the level's size,
+   // we only need it to be at least 1 in both width and height
+   if (intGrid.getWidth() == 0 || intGrid.getHeight() == 0)
+   {
+      // can't proceed, level size is wrong
+      return false;
+   }
+
+   // ensure level has same amount of TileGrids as there are layers
+   level.setTileGridCount(m_layers.size());
+   level.cleanUpTileGrids();
+
+   ASSERT(level.getTileGridCount() == m_layers.size(), "TileGrid count of Level should match count of Layers after calling Level::setTileGridCount");
+   return true;
+}
+
 void LdtkDefFile::generate(Level &level, size_t layerIdx, bool randomizeSeed) const
 {
    auto &intGrid = level.getIntGrid();
