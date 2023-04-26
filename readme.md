@@ -52,7 +52,7 @@ If you are not familiar with the structure of an .ldtk file, it's recommended to
 
 # Contributing
 
-As mentioned, this library only supports a subset of the [LDtk file schema](https://ldtk.io/files/JSON_SCHEMA.json). Just to name a few of the limitations: it doesn't import regular tile layers, entities (and that includes enum properties), or world data at all. It doesn't import the existing Level data (i.e. layer instances), preferring Levels to be generated at runtime. It also uses only one IntGrid per Level.
+As mentioned, this library only supports a subset of the [LDtk file schema](https://ldtk.io/files/JSON_SCHEMA.json). Just to name a few of the limitations: it doesn't import regular tile layers, entities (and that includes enum properties), or world data at all. It doesn't import the existing Level data (i.e. layer instances), preferring Levels to be generated at runtime. It assumes all layers/tilesets use the same grid size. It also uses only one IntGrid per Level.
 
 This wasn't exactly a deliberate design goal. It was more of a "hmm well my game doesn't need this LDtk feature, so I'm going to ignore it" series of spontaneous decisions (I would be using procedural map generation a lot, so it made no sense to be placing entities manually, ergo I ignored entities completely).
 
