@@ -117,7 +117,7 @@ bool Rule::matchesCell(
          {
             // we require anything to be in the cell, but the cell is empty
 #if !defined(NDEBUG) && LDTK_IMPORT_DEBUG_RULE > 1
-            debugLog << "failed. pattern required any value here";
+            debugLog << "(failed) pattern required any value here";
 #endif
             return false;
          }
@@ -125,7 +125,7 @@ bool Rule::matchesCell(
          {
             // we require the cell to be empty but something is in there
 #if !defined(NDEBUG) && LDTK_IMPORT_DEBUG_RULE > 1
-            debugLog << "failed. pattern required no value here";
+            debugLog << "(failed) pattern required no value here";
 #endif
             return false;
          }
@@ -133,7 +133,7 @@ bool Rule::matchesCell(
          {
             // we require the cell to have a specific IntGridValue, but the cell doesn't have that specific one
 #if !defined(NDEBUG) && LDTK_IMPORT_DEBUG_RULE > 1
-            debugLog << "failed. pattern required " << patternValue;
+            debugLog << "(failed) pattern required " << patternValue;
 #endif
             return false;
          }
@@ -142,11 +142,15 @@ bool Rule::matchesCell(
             // (a negative pattern value represents "any value is fine here as long as it's not that specific one")
             // we require the cell to NOT have a specific IntGridValue, but the cell has it
 #if !defined(NDEBUG) && LDTK_IMPORT_DEBUG_RULE > 1
-            debugLog << "failed. pattern required " << -patternValue;
+            debugLog << "(failed) pattern required: not " << -patternValue;
 #endif
             return false;
          }
 #if !defined(NDEBUG) && LDTK_IMPORT_DEBUG_RULE > 1
+         else
+         {
+            debugLog << "(passed)";
+         }
          debugLog << std::endl;
 #endif
       }
