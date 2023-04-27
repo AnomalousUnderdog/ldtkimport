@@ -359,7 +359,7 @@ void Rule::applyRule(
 
                   int locationX = cellX + (offset.x * (tile::isFlippedX(flags) ? -1 : 1));
                   int locationY = cellY + (offset.y * (tile::isFlippedY(flags) ? -1 : 1));
-                  if (locationX < 0 || locationX > cells.getWidth() || locationY < 0 || locationY > cells.getHeight())
+                  if (locationX < 0 || locationX >= cells.getWidth() || locationY < 0 || locationY >= cells.getHeight())
                   {
                      // Tile of stamp went over the map, skip it.
                      // It's ok if part of the stamp is cut-off,
