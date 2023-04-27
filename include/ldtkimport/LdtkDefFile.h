@@ -130,7 +130,7 @@ public:
 #if !defined(NDEBUG) && LDTK_IMPORT_DEBUG_RULE > 0
       RuleLogs_t &rulesLog,
 #endif
-      Level &level, bool randomizeSeed = false) const;
+      Level &level, const uint8_t runSettings = RunSettings::None) const;
 
    /**
     *  @brief Populate a layer of a level's TileGrids by letting this LdtkDefFile run its Rules through it.
@@ -143,7 +143,7 @@ public:
 #if !defined(NDEBUG) && LDTK_IMPORT_DEBUG_RULE > 0
       RuleLogs_t &rulesLog,
 #endif
-      Level &level, size_t layerIdx, uint32_t randomSeed) const;
+      Level &level, const size_t layerIdx, const uint32_t randomSeed, const uint8_t runSettings = RunSettings::None) const;
 
    // ---------------------------------------------------------------------
 

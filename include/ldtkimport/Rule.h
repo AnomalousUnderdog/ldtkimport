@@ -20,6 +20,25 @@ namespace ldtkimport
 static const int RULE_PATTERN_ANYTHING = 1000001;
 static const int RULE_PATTERN_NOTHING = -1000001;
 
+namespace RunSettings
+{
+
+static const uint8_t None = 0;
+static const uint8_t RandomizeSeeds = 1 << 0;
+static const uint8_t FasterStampBreakOnMatch = 1 << 1;
+
+static inline bool hasRandomizeSeeds(const uint8_t flags)
+{
+   return (flags & RandomizeSeeds) == RandomizeSeeds;
+}
+
+static inline bool hasFasterStampBreakOnMatch(const uint8_t flags)
+{
+   return (flags & FasterStampBreakOnMatch) == FasterStampBreakOnMatch;
+}
+
+}
+
 /// @warning Any Visual Studio Project making use of ldtkimport should define LDTK_IMPORT_DEBUG_RULE with the same int value as the one defined in the ldtkimport's Solution.props file,
 /// or else you'll get an immediate Segmentation Fault on running the executable.
 /// Unfortunately, there's no easy way to make a solution-wide define in Visual Studio.
@@ -160,7 +179,7 @@ public:
 #if !defined(NDEBUG) && LDTK_IMPORT_DEBUG_RULE > 0
       RuleLog &ruleLog,
 #endif
-      TileGrid &tileGrid, const IntGrid &cells, const int randomSeed, const uint8_t rulePriority) const;
+      TileGrid &tileGrid, const IntGrid &cells, const int randomSeed, const uint8_t rulePriority, const uint8_t runSettings) const;
 
    /**
     *  @brief Unique identifier for this rule. Also contributes to the seed in pseudo-random number checks.

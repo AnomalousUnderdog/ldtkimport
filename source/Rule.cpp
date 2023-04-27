@@ -277,7 +277,7 @@ void Rule::applyRule(
 #if !defined(NDEBUG) && LDTK_IMPORT_DEBUG_RULE > 0
    RuleLog &ruleLog,
 #endif
-   TileGrid &tileGrid, const IntGrid &cells, const int randomSeed, const uint8_t rulePriority) const
+   TileGrid &tileGrid, const IntGrid &cells, const int randomSeed, const uint8_t rulePriority, const uint8_t runSettings) const
 {
    if (tileIds.size() == 0)
    {
@@ -349,7 +349,16 @@ void Rule::applyRule(
                   const Rule::Offset &offset = stampTileOffsets[tileIdx];
 
                   uint8_t flags;
-                  if ((offset.x == 0 && offset.y == 0) || !offset.hasAnyOffset())
+                  bool giveBreakOnMatch;
+                  if (RunSettings::hasFasterStampBreakOnMatch(runSettings))
+                  {
+                     giveBreakOnMatch = (offset.x == 0 && offset.y == 0) || !offset.hasAnyOffset();
+                  }
+                  else
+                  {
+                     giveBreakOnMatch = (offset.x == 0 && offset.y == 0) && !offset.hasAnyOffset();
+                  }
+                  if (giveBreakOnMatch)
                   {
                      /// @todo to properly implement breakOnMatch for tiles that are not exactly on the matched cell,
                      /// we'll need to check if there are no more transparent areas left in the cell

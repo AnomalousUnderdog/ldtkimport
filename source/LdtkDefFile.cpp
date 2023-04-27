@@ -763,7 +763,7 @@ void LdtkDefFile::generate(
 #if !defined(NDEBUG) && LDTK_IMPORT_DEBUG_RULE > 0
    RuleLogs_t &rulesLog,
 #endif
-   Level &level, bool randomizeSeed) const
+   Level &level, const uint8_t runSettings) const
 {
    auto &intGrid = level.getIntGrid();
 
@@ -782,7 +782,7 @@ void LdtkDefFile::generate(
    for (size_t layerIdx = 0, end = m_layers.size(); layerIdx < end; ++layerIdx)
    {
       uint32_t randomSeed;
-      if (randomizeSeed)
+      if (RunSettings::hasRandomizeSeeds(runSettings))
       {
          randomSeed = rand();
       }
@@ -795,7 +795,7 @@ void LdtkDefFile::generate(
 #if !defined(NDEBUG) && LDTK_IMPORT_DEBUG_RULE > 0
          rulesLog,
 #endif
-         level, layerIdx, randomSeed);
+         level, layerIdx, randomSeed, runSettings);
    } // for Layer
 }
 
@@ -829,7 +829,7 @@ void LdtkDefFile::generateLayer(
 #if !defined(NDEBUG) && LDTK_IMPORT_DEBUG_RULE > 0
    RuleLogs_t &rulesLog,
 #endif
-   Level &level, size_t layerIdx, uint32_t randomSeed) const
+   Level &level, const size_t layerIdx, const uint32_t randomSeed, const uint8_t runSettings) const
 {
    auto &intGrid = level.getIntGrid();
    auto &layer = m_layers[layerIdx];
@@ -877,7 +877,7 @@ void LdtkDefFile::generateLayer(
 #if !defined(NDEBUG) && LDTK_IMPORT_DEBUG_RULE > 0
             rulesLog[rule->uid],
 #endif
-            tileGrid, intGrid, tileGrid.getRandomSeed(), rulePriority);
+            tileGrid, intGrid, tileGrid.getRandomSeed(), rulePriority, runSettings);
 
          ++rulePriority;
       } // for Rule
