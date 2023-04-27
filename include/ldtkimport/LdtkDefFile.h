@@ -105,6 +105,8 @@ public:
     */
    void debugPrintRule(std::ostream &outStream, int ruleUid) const;
 
+   // ---------------------------------------------------------------------
+
    /**
     *  @brief Ensure the given level has correct data to allow this LdtkDefFile to run its rules on it.
     *  @param[out] level The level that will be checked.
@@ -155,6 +157,14 @@ public:
     *  @return true means the Layer was found, false if not.
     */
    bool getTileset(int tilesetDefUid, const TileSet *&result) const;
+
+   /**
+    *  @brief Find a Layer with the given unique id.
+    *  @param[in] layerDefUid Unique id of the Layer to get.
+    *  @param[out] result Where the found Layer will be in, if any. Use the return value to check.
+    *  @return true means the Layer was found, false if not.
+    */
+   bool getLayer(int layerDefUid, Layer *&result);
 
    // ---------------------------------------------------------------------
    // Note: These next set of functions are used for debugging, to
@@ -293,6 +303,19 @@ public:
    }
 
    // ---------------------------------------------------------------------
+   // Manual Creation of data
+
+   void addLayer(Layer &&layer)
+   {
+      m_layers.push_back(layer);
+   }
+
+   void addTileset(TileSet &&tileset)
+   {
+      m_tilesets.push_back(tileset);
+   }
+
+   // ---------------------------------------------------------------------
    // Functions to iterate through layers
 
    using layer_iterator = layers_t::iterator;
@@ -386,14 +409,6 @@ private:
     *  @param[in] newInitialSeed Random seed value for the Layer.
     */
    void setLayerInitialSeed(int layerDefUid, int newInitialSeed);
-
-   /**
-    *  @brief Find a Layer with the given unique id.
-    *  @param[in] layerDefUid Unique id of the Layer to get.
-    *  @param[out] result Where the found Layer will be in, if any. Use the return value to check.
-    *  @return true means the Layer was found, false if not.
-    */
-   bool getLayer(int layerDefUid, Layer *&result);
 
    // ---------------------------------------------------------------------
 

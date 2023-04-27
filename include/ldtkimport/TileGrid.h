@@ -218,6 +218,101 @@ public:
       return m_randomSeed;
    }
 
+   uid_t getLayerUid() const
+   {
+      return m_layerUid;
+   }
+
+   std::string getTileIdDebugString() const
+   {
+      std::stringstream os;
+      os << std::endl;
+
+      for (int y = 0; y < m_height; ++y)
+      {
+         for (int x = 0; x < m_width; ++x)
+         {
+            const tiles_t &tilesInCell = m_grid[GridUtility::getIndex(x, y, m_width)];
+
+            auto tileLen = tilesInCell.size();
+
+            if (tileLen == 0)
+            {
+               os << "[";
+            }
+            else
+            {
+               os << "[";// << x << "," << y << ":";
+               for (size_t n = 0; n < tileLen; ++n)
+               {
+                  os << tilesInCell[n].tileId;
+                  if (n < tileLen - 1)
+                  {
+                     os << ", ";
+                  }
+               }
+            }
+
+            if (x != m_width - 1)
+            {
+               os << "], ";
+            }
+            else
+            {
+               os << "]";
+            }
+         }
+         os << std::endl;
+      }
+
+      return os.str();
+   }
+
+   std::string getRulePriorityDebugString() const
+   {
+      std::stringstream os;
+      os << std::endl;
+
+      for (int y = 0; y < m_height; ++y)
+      {
+         for (int x = 0; x < m_width; ++x)
+         {
+            const tiles_t &tilesInCell = m_grid[GridUtility::getIndex(x, y, m_width)];
+
+            auto tileLen = tilesInCell.size();
+
+            if (tileLen == 0)
+            {
+               os << "[";
+            }
+            else
+            {
+               os << "[";
+               for (size_t n = 0; n < tileLen; ++n)
+               {
+                  os << +(tilesInCell[n].priority);
+                  if (n < tileLen - 1)
+                  {
+                     os << ", ";
+                  }
+               }
+            }
+
+            if (x != m_width - 1)
+            {
+               os << "], ";
+            }
+            else
+            {
+               os << "]";
+            }
+         }
+         os << std::endl;
+      }
+
+      return os.str();
+   }
+
    friend std::ostream &operator<<(std::ostream &os, const TileGrid &tileGrid);
 
 private:
