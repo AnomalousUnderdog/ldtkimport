@@ -24,6 +24,9 @@
     <ClCompile Include="IntGridTest.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="RulesTest.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="assets\RF_Catacombs_v1.0\mainlevbuild.png">
