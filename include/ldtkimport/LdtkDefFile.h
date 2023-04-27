@@ -53,7 +53,11 @@ public:
     *  @param[in] filename Filename of the Ldtk file to load. Not strictly needed,
     *                      only used for debugging/informational purposes.
     */
-   void loadFromText(const char *ldtkText, size_t textLength, bool loadDeactivatedContent, const char *filename);
+   void loadFromText(
+#if !defined(NDEBUG) && LDTK_IMPORT_DEBUG_RULE > 0
+      RuleLogs_t &rulesLog,
+#endif
+      const char *ldtkText, size_t textLength, bool loadDeactivatedContent, const char *filename);
 
    /**
     *  @brief Populate this LdtkDefFile with values coming from the ldtk file specified.
@@ -63,7 +67,31 @@ public:
     *                                    the file. Some level designers have tests/experiments that they
     *                                    keep deactivated, so you might not want to bother with those.
     */
-   void loadFromFile(const char *ldtkFile, bool loadDeactivatedContent);
+   void loadFromFile(
+#if !defined(NDEBUG) && LDTK_IMPORT_DEBUG_RULE > 0
+      RuleLogs_t &rulesLog,
+#endif
+      const char *ldtkFile, bool loadDeactivatedContent);
+
+   /**
+    *  @brief This computes certain values that will be cached, so that
+    *  they wouldn't have to be computed over and over every time you generate a new level.
+    *  Particularly, this caches the offsets for each tile to be used in a tile stamp.
+    *
+    *  This is automatically called in loadFromText.
+    *  If you assign data to the LdtkDefFile procedurally, then you should call this manually as the last step.
+    *
+    *  @param[in] preProcessDeactivatedContent Whether or not we also compute cache for deactivated
+    *  RuleGroups and Rules. Some level designers have tests/experiments that they keep
+    *  deactivated, so you might not want to bother with those.
+    */
+   void preProcess(
+#if !defined(NDEBUG) && LDTK_IMPORT_DEBUG_RULE > 0
+      RuleLogs_t &rulesLog,
+#endif
+      bool preProcessDeactivatedContent = false);
+
+   // ---------------------------------------------------------------------
 
    /**
     *  @brief Prints the contents of the LdtkDefFile to the out stream.
@@ -91,17 +119,26 @@ public:
     *  @param[in] randomizeSeed Set to true to give a new random seed to each layer,
     *                           creating a new variation for the randomized parts.
     */
-   void generate(Level &level, bool randomizeSeed = false) const;
+   void generate(
+#if !defined(NDEBUG) && LDTK_IMPORT_DEBUG_RULE > 0
+      RuleLogs_t &rulesLog,
+#endif
+      Level &level, bool randomizeSeed = false) const;
 
    /**
     *  @brief Populate a layer of a level's TileGrids by letting this LdtkDefFile run its Rules through it.
     *
     *  @param[out] level Where output of rule matching process is placed onto.
     *  @param[in] layerIdx Which layer's rules to run.
-    *  @param[in] randomizeSeed Set to true to give a new random seed to each layer,
-    *                           creating a new variation for the randomized parts.
+    *  @param[in] randomSeed Random seed value to use for the layer.
     */
-   void generate(Level &level, size_t layerIdx, bool randomizeSeed = false) const;
+   void generateLayer(
+#if !defined(NDEBUG) && LDTK_IMPORT_DEBUG_RULE > 0
+      RuleLogs_t &rulesLog,
+#endif
+      Level &level, size_t layerIdx, uint32_t randomSeed) const;
+
+   // ---------------------------------------------------------------------
 
    /**
     *  @brief Find a TileSet with the given unique id.
@@ -357,19 +394,6 @@ private:
     *  @return true means the Layer was found, false if not.
     */
    bool getLayer(int layerDefUid, Layer *&result);
-
-   /**
-    *  @brief This computes certain values that will be cached, so that
-    *  they wouldn't have to be computed over and over every time you generate a new level.
-    *  Particularly, this caches the offsets for each tile to be used in a tile stamp.
-    *
-    *  This is automatically called in loadFromText.
-    *
-    *  @param[in] preProcessDeactivatedContent Whether or not we also compute cache for deactivated
-    *  RuleGroups and Rules. Some level designers have tests/experiments that they keep
-    *  deactivated, so you might not want to bother with those.
-    */
-   void preProcess(bool preProcessDeactivatedContent = false);
 
    // ---------------------------------------------------------------------
 

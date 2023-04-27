@@ -106,7 +106,11 @@ bool LdtkDefFile::getLayer(int layerDefUid, Layer *&result)
 
 #define USE_IFSTREAM
 
-void LdtkDefFile::loadFromFile(const char *ldtkFile, bool loadDeactivatedContent)
+void LdtkDefFile::loadFromFile(
+#if !defined(NDEBUG) && LDTK_IMPORT_DEBUG_RULE > 0
+   RuleLogs_t &rulesLog,
+#endif
+   const char *ldtkFile, bool loadDeactivatedContent)
 {
 #if defined(USE_FOPEN)
 
@@ -154,7 +158,11 @@ void LdtkDefFile::loadFromFile(const char *ldtkFile, bool loadDeactivatedContent
    size_t jsonTextLen = buffer_string.length();
 #endif
 
-   loadFromText(jsonText, jsonTextLen, loadDeactivatedContent, ldtkFile);
+   loadFromText(
+#if !defined(NDEBUG) && LDTK_IMPORT_DEBUG_RULE > 0
+      rulesLog,
+#endif
+      jsonText, jsonTextLen, loadDeactivatedContent, ldtkFile);
 }
 
 const char *LAYER_TYPE_AUTO_LAYER = "AutoLayer";
@@ -167,7 +175,11 @@ const char *RULE_CHECKER_MODE_VERTICAL = "Vertical";
 const char *TILE_MODE_SINGLE = "Single";
 const char *TILE_MODE_STAMP = "Stamp";
 
-void LdtkDefFile::loadFromText(const char *ldtkText, size_t textLength, bool loadDeactivatedContent, const char *filename)
+void LdtkDefFile::loadFromText(
+#if !defined(NDEBUG) && LDTK_IMPORT_DEBUG_RULE > 0
+   RuleLogs_t &rulesLog,
+#endif
+   const char *ldtkText, size_t textLength, bool loadDeactivatedContent, const char *filename)
 {
    auto ldtk_json = yyjson_read(ldtkText, textLength, 0);
    if (ldtk_json == nullptr)
@@ -486,10 +498,18 @@ void LdtkDefFile::loadFromText(const char *ldtkText, size_t textLength, bool loa
    // so they should be copied to new variables before calling this
    yyjson_doc_free(ldtk_json);
 
-   preProcess(loadDeactivatedContent);
+   preProcess(
+#if !defined(NDEBUG) && LDTK_IMPORT_DEBUG_RULE > 0
+      rulesLog,
+#endif
+      loadDeactivatedContent);
 }
 
-void LdtkDefFile::preProcess(bool preProcessDeactivatedContent)
+void LdtkDefFile::preProcess(
+#if !defined(NDEBUG) && LDTK_IMPORT_DEBUG_RULE > 0
+   RuleLogs_t &rulesLog,
+#endif
+   bool preProcessDeactivatedContent)
 {
    int r, g, b;
 #if defined(__STDC_LIB_EXT1__) || defined(_MSC_VER)
@@ -540,7 +560,11 @@ void LdtkDefFile::preProcess(bool preProcessDeactivatedContent)
          for (auto rule = ruleGroup->rules.begin(), ruleEnd = ruleGroup->rules.end(); rule != ruleEnd; ++rule)
          {
 #if !defined(NDEBUG) && LDTK_IMPORT_DEBUG_RULE > 0
-            rule->stampDebugInfo = "";
+            if (rulesLog.count(rule->uid) == 0)
+            {
+               rulesLog.insert(std::make_pair(rule->uid, RuleLog()));
+            }
+            rulesLog[rule->uid].stampDebugInfo = "";
 #endif
 
             if (!rule->active && !preProcessDeactivatedContent)
@@ -680,14 +704,18 @@ void LdtkDefFile::preProcess(bool preProcessDeactivatedContent)
                "For rule " << rule->uid << ", stampTileOffsets size should match tileIds size at this point. stampTileOffsets.size(): " << rule->stampTileOffsets.size() << " tileIds.size(): " << rule->tileIds.size());
 
 #if !defined(NDEBUG) && LDTK_IMPORT_DEBUG_RULE > 0
-            rule->stampDebugInfo = stampDebugLog.str();
+            rulesLog[rule->uid].stampDebugInfo = stampDebugLog.str();
 #endif
          } // for Rule
       } // for RuleGroup
    } // for Layer
 }
 
-void LdtkDefFile::generate(Level &level, bool randomizeSeed) const
+void LdtkDefFile::generate(
+#if !defined(NDEBUG) && LDTK_IMPORT_DEBUG_RULE > 0
+   RuleLogs_t &rulesLog,
+#endif
+   Level &level, bool randomizeSeed) const
 {
    auto &intGrid = level.getIntGrid();
 
@@ -705,7 +733,21 @@ void LdtkDefFile::generate(Level &level, bool randomizeSeed) const
 
    for (size_t layerIdx = 0, end = m_layers.size(); layerIdx < end; ++layerIdx)
    {
-      generate(level, layerIdx, randomizeSeed);
+      uint32_t randomSeed;
+      if (randomizeSeed)
+      {
+         randomSeed = rand();
+      }
+      else
+      {
+         randomSeed = m_layers[layerIdx].initialRandomSeed;
+      }
+
+      generateLayer(
+#if !defined(NDEBUG) && LDTK_IMPORT_DEBUG_RULE > 0
+         rulesLog,
+#endif
+         level, layerIdx, randomSeed);
    } // for Layer
 }
 
@@ -729,21 +771,17 @@ bool LdtkDefFile::ensureValidForGenerate(Level &level) const
    return true;
 }
 
-void LdtkDefFile::generate(Level &level, size_t layerIdx, bool randomizeSeed) const
+void LdtkDefFile::generateLayer(
+#if !defined(NDEBUG) && LDTK_IMPORT_DEBUG_RULE > 0
+   RuleLogs_t &rulesLog,
+#endif
+   Level &level, size_t layerIdx, uint32_t randomSeed) const
 {
    auto &intGrid = level.getIntGrid();
    auto &layer = m_layers[layerIdx];
    auto &tileGrid = level.getTileGrid(layerIdx);
 
-   if (randomizeSeed)
-   {
-      tileGrid.setRandomSeed(rand());
-   }
-   else
-   {
-      tileGrid.setRandomSeed(layer.initialRandomSeed);
-   }
-
+   tileGrid.setRandomSeed(randomSeed);
    tileGrid.setLayerUid(layer.uid);
 
    uint8_t rulePriority = 0;
@@ -774,7 +812,18 @@ void LdtkDefFile::generate(Level &level, size_t layerIdx, bool randomizeSeed) co
             continue;
          }
 
-         rule->applyRule(tileGrid, intGrid, tileGrid.getRandomSeed(), rulePriority);
+#if !defined(NDEBUG) && LDTK_IMPORT_DEBUG_RULE > 0
+         if (rulesLog.count(rule->uid) == 0)
+         {
+            rulesLog.insert(std::make_pair(rule->uid, RuleLog()));
+         }
+#endif
+
+         rule->applyRule(
+#if !defined(NDEBUG) && LDTK_IMPORT_DEBUG_RULE > 0
+            rulesLog[rule->uid],
+#endif
+            tileGrid, intGrid, tileGrid.getRandomSeed(), rulePriority);
 
          ++rulePriority;
       } // for Rule

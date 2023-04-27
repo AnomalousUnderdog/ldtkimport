@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <ostream>
+#include <unordered_map>
 
 #include "ldtkimport/MiscUtility.h"
 #include "ldtkimport/Types.h"
@@ -32,6 +33,58 @@ struct DebugMatchCell
    uint8_t flags;
    std::string extra;
 };
+
+struct RuleLog
+{
+   /**
+    *  @brief Only used for debugging. Lists all cells that this Rule matched.
+    */
+   std::vector<DebugMatchCell> matchedCells;
+
+   /**
+    *  @brief Only used for debugging. Log of what was stored in the stamp cache calculation.
+    */
+   std::string stampDebugInfo;
+};
+
+using RuleLogs_t = std::unordered_map<uid_t, RuleLog>;
+
+inline std::ostream &operator<<(std::ostream &os, const RuleLog &rule)
+{
+   if (!rule.stampDebugInfo.empty())
+   {
+      os << rule.stampDebugInfo;
+   }
+
+   os << "Matched: " << rule.matchedCells.size() << std::endl;
+   for (auto matched = rule.matchedCells.cbegin(), matchedEnd = rule.matchedCells.cend(); matched != matchedEnd; ++matched)
+   {
+      os << "(" << matched->x << ", " << matched->y << ") ";
+      if (tile::hasOffsetLeft(matched->flags))
+      {
+         os << "OffsetLeft ";
+      }
+      if (tile::hasOffsetUp(matched->flags))
+      {
+         os << "OffsetUp ";
+      }
+      if (tile::isFlippedX(matched->flags))
+      {
+         os << "FlippedX ";
+      }
+      if (tile::isFlippedY(matched->flags))
+      {
+         os << "FlippedY ";
+      }
+      if (tile::isFinal(matched->flags))
+      {
+         os << "Final ";
+      }
+      os << matched->extra << std::endl;
+   }
+
+   return os;
+}
 #endif
 
 /**
@@ -47,10 +100,6 @@ struct Rule
 public:
 
    Rule() :
-#if !defined(NDEBUG) && LDTK_IMPORT_DEBUG_RULE > 0
-      matchedCells(),
-      stampDebugInfo(),
-#endif
       uid(0),
       active(true),
       chance(1.0f),
@@ -86,7 +135,11 @@ public:
     *                          visually be on top of other tiles (that are placed by other rules) on the same cell.
     *                          Lower values have higher priority. Starts at 0 (highest priority).
     */
-   void applyRule(TileGrid &tileGrid, const IntGrid &cells, const int randomSeed, const uint8_t rulePriority) const;
+   void applyRule(
+#if !defined(NDEBUG) && LDTK_IMPORT_DEBUG_RULE > 0
+      RuleLog &ruleLog,
+#endif
+      TileGrid &tileGrid, const IntGrid &cells, const int randomSeed, const uint8_t rulePriority) const;
 
    /**
     *  @brief Unique identifier for this rule. Also contributes to the seed in pseudo-random number checks.
@@ -404,18 +457,6 @@ public:
     */
    std::vector<Offset> stampTileOffsets;
 
-#if !defined(NDEBUG) && defined(LDTK_IMPORT_DEBUG_RULE) && LDTK_IMPORT_DEBUG_RULE > 0
-   /**
-    *  @brief Only used for debugging. Lists all cells that this Rule matched.
-    */
-   std::vector<DebugMatchCell> matchedCells;
-
-   /**
-    *  @brief Only used for debugging. Log of what was stored in the stamp cache calculation.
-    */
-   std::string stampDebugInfo;
-#endif
-
 
    friend std::ostream &operator<<(std::ostream &os, const Rule &rule);
 
@@ -452,7 +493,11 @@ private:
     *          The flag will also indicate if it was the horizontally and/or vertically flipped version
     *          of the Rule that matched, if ever.
     */
-   int8_t passesRule(const IntGrid &cells, const int cellX, const int cellY, const int randomSeed) const;
+   int8_t passesRule(
+#if !defined(NDEBUG) && LDTK_IMPORT_DEBUG_RULE > 1
+      RuleLog &ruleLog,
+#endif
+      const IntGrid &cells, const int cellX, const int cellY, const int randomSeed) const;
 };
 
 inline std::ostream &operator<<(std::ostream &os, const Rule &rule)
@@ -543,40 +588,6 @@ inline std::ostream &operator<<(std::ostream &os, const Rule &rule)
       os << "  (" << stampTileOffset.x << ", " << stampTileOffset.y << ") " << +(stampTileOffset.flags) << std::endl;
    }
 
-#if !defined(NDEBUG) && LDTK_IMPORT_DEBUG_RULE > 0
-
-   if (!rule.stampDebugInfo.empty())
-   {
-      os << rule.stampDebugInfo;
-   }
-
-   os << "Matched: " << rule.matchedCells.size() << std::endl;
-   for (auto matched = rule.matchedCells.cbegin(), matchedEnd = rule.matchedCells.cend(); matched != matchedEnd; ++matched)
-   {
-      os << "(" << matched->x << ", " << matched->y << ") ";
-      if (tile::hasOffsetLeft(matched->flags))
-      {
-         os << "OffsetLeft ";
-      }
-      if (tile::hasOffsetUp(matched->flags))
-      {
-         os << "OffsetUp ";
-      }
-      if (tile::isFlippedX(matched->flags))
-      {
-         os << "FlippedX ";
-      }
-      if (tile::isFlippedY(matched->flags))
-      {
-         os << "FlippedY ";
-      }
-      if (tile::isFinal(matched->flags))
-      {
-         os << "Final ";
-      }
-      os << matched->extra << std::endl;
-   }
-#endif
    return os;
 }
 

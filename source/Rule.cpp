@@ -117,7 +117,7 @@ bool Rule::matchesCell(
          {
             // we require anything to be in the cell, but the cell is empty
 #if !defined(NDEBUG) && LDTK_IMPORT_DEBUG_RULE > 1
-            debugLog << "pattern required any value here";
+            debugLog << "failed. pattern required any value here";
 #endif
             return false;
          }
@@ -125,7 +125,7 @@ bool Rule::matchesCell(
          {
             // we require the cell to be empty but something is in there
 #if !defined(NDEBUG) && LDTK_IMPORT_DEBUG_RULE > 1
-            debugLog << "pattern required no value here";
+            debugLog << "failed. pattern required no value here";
 #endif
             return false;
          }
@@ -133,7 +133,7 @@ bool Rule::matchesCell(
          {
             // we require the cell to have a specific IntGridValue, but the cell doesn't have that specific one
 #if !defined(NDEBUG) && LDTK_IMPORT_DEBUG_RULE > 1
-            debugLog << "pattern required " << patternValue;
+            debugLog << "failed. pattern required " << patternValue;
 #endif
             return false;
          }
@@ -142,7 +142,7 @@ bool Rule::matchesCell(
             // (a negative pattern value represents "any value is fine here as long as it's not that specific one")
             // we require the cell to NOT have a specific IntGridValue, but the cell has it
 #if !defined(NDEBUG) && LDTK_IMPORT_DEBUG_RULE > 1
-            debugLog << "pattern required " << -patternValue;
+            debugLog << "failed. pattern required " << -patternValue;
 #endif
             return false;
          }
@@ -153,9 +153,13 @@ bool Rule::matchesCell(
    }
 
    // passed all checks
+#if !defined(NDEBUG) && LDTK_IMPORT_DEBUG_RULE > 1
+   debugLog << "passed";
+#endif
    return true;
 }
 
+// -----------------------------------------------------------------------------------------------------
 
 /**
  *  @brief Return value given by passesRule to indicate that the Rule did not match.
@@ -167,8 +171,13 @@ static const int8_t RULE_FAIL = -1;
  */
 static const int8_t RULE_SUCCESS_NORMAL = 0;
 
+// -----------------------------------------------------------------------------------------------------
 
-int8_t Rule::passesRule(const IntGrid &cells, const int cellX, const int cellY, const int randomSeed) const
+int8_t Rule::passesRule(
+#if !defined(NDEBUG) && LDTK_IMPORT_DEBUG_RULE > 1
+   RuleLog &ruleLog,
+#endif
+   const IntGrid &cells, const int cellX, const int cellY, const int randomSeed) const
 {
    // based on https://github.com/deepnight/ldtk/blob/08b91171913fe816c6ad8a09630c586ad63e174b/src/electron.renderer/data/inst/LayerInstance.hx#L720
 
@@ -177,7 +186,7 @@ int8_t Rule::passesRule(const IntGrid &cells, const int cellX, const int cellY, 
    if (checker != CheckerMode::Vertical && ((cellY - yModuloOffset) % yModulo) != 0)
    {
 #if !defined(NDEBUG) && LDTK_IMPORT_DEBUG_RULE > 1
-      matchedCells.push_back(DebugMatchCell{ cellX, cellY, 0, std::string("Skipped due to Y Modulo") });
+      ruleLog.matchedCells.push_back(DebugMatchCell{ cellX, cellY, 0, std::string("Skipped due to Y Modulo") });
 #endif
       return RULE_FAIL;
    }
@@ -185,7 +194,7 @@ int8_t Rule::passesRule(const IntGrid &cells, const int cellX, const int cellY, 
    if (checker == CheckerMode::Vertical && ((cellY + ((cellX / xModulo) % 2)) % yModulo) != 0)
    {
 #if !defined(NDEBUG) && LDTK_IMPORT_DEBUG_RULE > 1
-      matchedCells.push_back(DebugMatchCell{ cellX, cellY, 0, std::string("Skipped due to Checker Y Modulo") });
+      ruleLog.matchedCells.push_back(DebugMatchCell{ cellX, cellY, 0, std::string("Skipped due to Checker Y Modulo") });
 #endif
       return RULE_FAIL;
    }
@@ -193,7 +202,7 @@ int8_t Rule::passesRule(const IntGrid &cells, const int cellX, const int cellY, 
    if (checker != CheckerMode::Horizontal && ((cellX - xModuloOffset) % xModulo) != 0)
    {
 #if !defined(NDEBUG) && LDTK_IMPORT_DEBUG_RULE > 1
-      matchedCells.push_back(DebugMatchCell{ cellX, cellY, 0, std::string("Skipped due to X Modulo") });
+      ruleLog.matchedCells.push_back(DebugMatchCell{ cellX, cellY, 0, std::string("Skipped due to X Modulo") });
 #endif
       return RULE_FAIL;
    }
@@ -201,7 +210,7 @@ int8_t Rule::passesRule(const IntGrid &cells, const int cellX, const int cellY, 
    if (checker == CheckerMode::Horizontal && ((cellX + ((cellY / yModulo) % 2)) % xModulo) != 0)
    {
 #if !defined(NDEBUG) && LDTK_IMPORT_DEBUG_RULE > 1
-      matchedCells.push_back(DebugMatchCell{ cellX, cellY, 0, std::string("Skipped due to Checker X Modulo") });
+      ruleLog.matchedCells.push_back(DebugMatchCell{ cellX, cellY, 0, std::string("Skipped due to Checker X Modulo") });
 #endif
       return RULE_FAIL;
    }
@@ -249,12 +258,18 @@ int8_t Rule::passesRule(const IntGrid &cells, const int cellX, const int cellY, 
    }
 
 #if !defined(NDEBUG) && LDTK_IMPORT_DEBUG_RULE > 1
-   matchedCells.push_back(DebugMatchCell{ cellX, cellY, 0, debugInfo.str() });
+   ruleLog.matchedCells.push_back(DebugMatchCell{ cellX, cellY, 0, debugInfo.str() });
 #endif
    return RULE_FAIL;
 }
 
-void Rule::applyRule(TileGrid &tileGrid, const IntGrid &cells, const int randomSeed, const uint8_t rulePriority) const
+// -----------------------------------------------------------------------------------------------------
+
+void Rule::applyRule(
+#if !defined(NDEBUG) && LDTK_IMPORT_DEBUG_RULE > 0
+   RuleLog &ruleLog,
+#endif
+   TileGrid &tileGrid, const IntGrid &cells, const int randomSeed, const uint8_t rulePriority) const
 {
    if (tileIds.size() == 0)
    {
@@ -263,7 +278,7 @@ void Rule::applyRule(TileGrid &tileGrid, const IntGrid &cells, const int randomS
    }
 
 #if !defined(NDEBUG) && LDTK_IMPORT_DEBUG_RULE > 0
-   matchedCells.clear();
+   ruleLog.matchedCells.clear();
 #endif
 
    for (int cellY = 0; cellY < cells.getHeight(); ++cellY)
@@ -274,10 +289,17 @@ void Rule::applyRule(TileGrid &tileGrid, const IntGrid &cells, const int randomS
       {
          if (!tileGrid.canStillPlaceTiles(cellX, cellY))
          {
+#if !defined(NDEBUG) && LDTK_IMPORT_DEBUG_RULE > 0
+            ruleLog.matchedCells.push_back(DebugMatchCell{ cellX, cellY, 0, "skipping. cell already finalized." });
+#endif
             continue;
          }
 
-         int8_t ruleMatchResult = passesRule(cells, cellX, cellY, randomSeed);
+         int8_t ruleMatchResult = passesRule(
+#if !defined(NDEBUG) && LDTK_IMPORT_DEBUG_RULE > 1
+            ruleLog,
+#endif
+            cells, cellX, cellY, randomSeed);
 
          if (ruleMatchResult == RULE_FAIL)
          {
@@ -285,7 +307,7 @@ void Rule::applyRule(TileGrid &tileGrid, const IntGrid &cells, const int randomS
          }
 
 #if !defined(NDEBUG) && LDTK_IMPORT_DEBUG_RULE > 0
-         matchedCells.push_back(DebugMatchCell{ cellX, cellY, 0 });
+         ruleLog.matchedCells.push_back(DebugMatchCell{ cellX, cellY, 0, "success" });
 #endif
 
          switch (tileMode)
