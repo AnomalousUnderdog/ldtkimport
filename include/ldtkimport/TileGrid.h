@@ -38,6 +38,7 @@ public:
 
    TileGrid() :
       m_layerUid(0),
+      m_randomSeed(0),
       m_width(0),
       m_height(0),
       m_grid()
@@ -46,6 +47,7 @@ public:
 
    TileGrid(dimensions_t width, dimensions_t height) :
       m_layerUid(0),
+      m_randomSeed(0),
       m_width(width),
       m_height(height),
       m_grid(width * height, tiles_t())
@@ -208,12 +210,12 @@ public:
 
    void setRandomSeed(uint32_t newRandomSeed)
    {
-      randomSeed = newRandomSeed;
+      m_randomSeed = newRandomSeed;
    }
 
    uint32_t getRandomSeed() const
    {
-      return randomSeed;
+      return m_randomSeed;
    }
 
    friend std::ostream &operator<<(std::ostream &os, const TileGrid &tileGrid);
@@ -230,7 +232,7 @@ private:
     *  This is stored in case later on, if you want to serialize the generated level
     *  so that it can be recreated later on.
     */
-   uint32_t randomSeed;
+   uint32_t m_randomSeed;
 
    dimensions_t m_width;
    dimensions_t m_height;
