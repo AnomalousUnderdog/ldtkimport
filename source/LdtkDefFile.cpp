@@ -638,6 +638,7 @@ void LdtkDefFile::preProcess(
 #endif
 
             // now each tile in the stamp needs to be given their local offset
+            rule->stampTileOffsets.clear();
             rule->stampTileOffsets.reserve(rule->tileIds.size());
 
             for (auto tileId = rule->tileIds.begin(), tileIdEnd = rule->tileIds.end(); tileId != tileIdEnd; ++tileId)
