@@ -183,6 +183,10 @@ int8_t Rule::passesRule(
 
    // modulo acts as a filter
    //
+
+   ASSERT_THROW(xModulo != 0 && yModulo != 0, std::logic_error,
+      "Modulo to be used as divisor is zero. xModulo: " << xModulo << " yModulo: " << yModulo);
+
    if (checker != CheckerMode::Vertical && ((cellY - yModuloOffset) % yModulo) != 0)
    {
 #if !defined(NDEBUG) && LDTK_IMPORT_DEBUG_RULE > 1

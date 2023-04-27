@@ -106,9 +106,9 @@ public:
       breakOnMatch(true),
       flipX(false),
       flipY(false),
-      xModulo(0),
+      xModulo(1),
       xModuloOffset(0),
-      yModulo(0),
+      yModulo(1),
       yModuloOffset(0),
       checker(CheckerMode::None),
       verticalOutOfBoundsValue(-1),
@@ -121,6 +121,27 @@ public:
       stampPivotY(0.0f),
       stampTileOffsets()
    {
+   }
+
+   bool isValid() const
+   {
+      if (xModulo == 0 || yModulo == 0)
+      {
+         // Modulo should never be 0 because it's used as a divisor.
+         // We'll get a divide by zero error if this is used.
+         std::cout << "rule " << uid << " not valid due to modulo: xModulo: " << xModulo << " yModulo: " << yModulo << std::endl;
+         return false;
+      }
+
+      if (active && chance > 0 && tileMode == TileMode::Stamp && stampTileOffsets.size() != tileIds.size())
+      {
+         // stampTileOffsets not initialized, or has too many values
+         std::cout << "rule " << uid << " not valid due to stampTileOffsets" << std::endl;
+         return false;
+      }
+
+      // passed all checks
+      return true;
    }
 
    /**

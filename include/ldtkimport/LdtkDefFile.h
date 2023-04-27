@@ -108,6 +108,11 @@ public:
    // ---------------------------------------------------------------------
 
    /**
+    *  @brief Check if this Definition File has valid data.
+    */
+   bool isValid() const;
+
+   /**
     *  @brief Ensure the given level has correct data to allow this LdtkDefFile to run its rules on it.
     *  @param[out] level The level that will be checked.
     *  @return true if rule matching process can proceed, false if not (most likely the level has no width/height).

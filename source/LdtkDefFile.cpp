@@ -370,6 +370,17 @@ void LdtkDefFile::loadFromText(
             newRule.xModuloOffset = yyjson_obj_get_int(autoRule, "xOffset");
             newRule.yModuloOffset = yyjson_obj_get_int(autoRule, "yOffset");
 
+            // modulo values are used as divisors, so they shouldn't be 0
+            // there's also no point in them being negative
+            if (newRule.xModulo < 1)
+            {
+               newRule.xModulo = 1;
+            }
+            if (newRule.yModulo < 1)
+            {
+               newRule.yModulo = 1;
+            }
+
             auto checkerString = yyjson_obj_get_str(autoRule, "checker");
             if (std::strcmp(checkerString, RULE_CHECKER_MODE_NONE) == 0)
             {
@@ -711,6 +722,42 @@ void LdtkDefFile::preProcess(
    } // for Layer
 }
 
+bool LdtkDefFile::isValid() const
+{
+   for (auto layer = m_layers.cbegin(), layerEnd = m_layers.cend(); layer != layerEnd; ++layer)
+   {
+      for (auto ruleGroup = layer->ruleGroups.cbegin(), ruleGroupEnd = layer->ruleGroups.cend(); ruleGroup != ruleGroupEnd; ++ruleGroup)
+      {
+         if (!ruleGroup->active)
+         {
+            continue;
+         }
+
+         for (auto rule = ruleGroup->rules.cbegin(), ruleEnd = ruleGroup->rules.cend(); rule != ruleEnd; ++rule)
+         {
+            if (!rule->active)
+            {
+               continue;
+            }
+
+            if (rule->tileIds.size() == 0)
+            {
+               // no tiles for this rule, no point in processing
+               continue;
+            }
+
+            if (!rule->isValid())
+            {
+               return false;
+            }
+         }
+      }
+   }
+
+   // passed all checks
+   return true;
+}
+
 void LdtkDefFile::generate(
 #if !defined(NDEBUG) && LDTK_IMPORT_DEBUG_RULE > 0
    RuleLogs_t &rulesLog,
@@ -753,6 +800,12 @@ void LdtkDefFile::generate(
 
 bool LdtkDefFile::ensureValidForGenerate(Level &level) const
 {
+   if (!isValid())
+   {
+      // something wrong with our own data
+      return false;
+   }
+
    auto &intGrid = level.getIntGrid();
 
    // we don't really have a limit on the level's size,
