@@ -759,7 +759,7 @@ bool LdtkDefFile::isValid() const
    return true;
 }
 
-void LdtkDefFile::generate(
+void LdtkDefFile::runRules(
 #if !defined(NDEBUG) && LDTK_IMPORT_DEBUG_RULE > 0
    RuleLogs_t &rulesLog,
 #endif
@@ -791,7 +791,7 @@ void LdtkDefFile::generate(
          randomSeed = m_layers[layerIdx].initialRandomSeed;
       }
 
-      generateLayer(
+      runRulesOnLayer(
 #if !defined(NDEBUG) && LDTK_IMPORT_DEBUG_RULE > 0
          rulesLog,
 #endif
@@ -799,7 +799,7 @@ void LdtkDefFile::generate(
    } // for Layer
 }
 
-bool LdtkDefFile::ensureValidForGenerate(Level &level) const
+bool LdtkDefFile::ensureValidForRules(Level &level) const
 {
    if (!isValid())
    {
@@ -825,7 +825,7 @@ bool LdtkDefFile::ensureValidForGenerate(Level &level) const
    return true;
 }
 
-void LdtkDefFile::generateLayer(
+void LdtkDefFile::runRulesOnLayer(
 #if !defined(NDEBUG) && LDTK_IMPORT_DEBUG_RULE > 0
    RuleLogs_t &rulesLog,
 #endif

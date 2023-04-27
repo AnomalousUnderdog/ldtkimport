@@ -117,7 +117,7 @@ public:
     *  @param[out] level The level that will be checked.
     *  @return true if rule matching process can proceed, false if not (most likely the level has no width/height).
     */
-   bool ensureValidForGenerate(Level &level) const;
+   bool ensureValidForRules(Level &level) const;
 
    /**
     *  @brief Populate a level's TileGrids by letting this LdtkDefFile run its Rules through it.
@@ -126,7 +126,7 @@ public:
     *  @param[in] randomizeSeed Set to true to give a new random seed to each layer,
     *                           creating a new variation for the randomized parts.
     */
-   void generate(
+   void runRules(
 #if !defined(NDEBUG) && LDTK_IMPORT_DEBUG_RULE > 0
       RuleLogs_t &rulesLog,
 #endif
@@ -139,7 +139,7 @@ public:
     *  @param[in] layerIdx Which layer's rules to run.
     *  @param[in] randomSeed Random seed value to use for the layer.
     */
-   void generateLayer(
+   void runRulesOnLayer(
 #if !defined(NDEBUG) && LDTK_IMPORT_DEBUG_RULE > 0
       RuleLogs_t &rulesLog,
 #endif
