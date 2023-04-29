@@ -1,9 +1,9 @@
 # LdtkImport
 
-LdtkImport is an MIT-licensed C++ library for importing a subset of [.ldtk file](https://ldtk.io/json/) data. It specifically imports [Auto-layers](https://ldtk.io/docs/general/auto-layers/) and its [Rules](https://ldtk.io/docs/general/auto-layers/auto-layer-rules/), then performs the rule matching process to allow dynamically creating new levels during runtime.
+LdtkImport is an MIT-licensed C++ library for importing a subset of [.ldtk file](https://ldtk.io/json/) data. It specifically imports [Auto-layers](https://ldtk.io/docs/general/auto-layers/) and its [Rules](https://ldtk.io/docs/general/auto-layers/auto-layer-rules/), then performs the rule pattern matching process to allow dynamically creating new levels during runtime.
 
 * Engine-agnostic: This is a bare-bones implementation that will only load the data. When it runs the rule matching process, its output is also only just data. The only dependency it has is [yyjson](https://github.com/ibireme/yyjson) for parsing the ldtk file's json text.
-* A separate git repo uses this library for [LÖVE](https://github.com/love2d/love) as an example.
+* A separate git repo uses this library as an example.
 
 
 # Motivation
@@ -14,20 +14,18 @@ Virtually all [LDtk importing libraries](https://ldtk.io/api/) I have seen say t
 
 This is a missed opportunity, as the Rules data is ideal if you want to create new Levels at runtime.
 
-To clarify, neither LDtk's Rules nor the LdtkImport library does any procedural map generation. What Rules do, is automate the tile placement process, including random variations using a well-defined set of rules.
+To clarify, neither LDtk's Rules nor the LdtkImport library does any procedural map generation. What LDtk Rules do, is automate the tile placement process, including random variations using a well-defined set of rules. It can add visual variety on top of a generated map by randomizing what tiles are displayed for any given cell.
 
 The LDtk editor itself also does a good job of being beginner-friendly, making it easy to pick up for level designers (at least, easier to understand than [Tiled](https://www.mapeditor.org/)'s equivalent [Automapping](https://doc.mapeditor.org/en/stable/manual/automapping/) feature, in my experience!).
 
-Preferably, you should pair LdtkImport with a procedural map generation library: take the output of the procedural map generator, which would just be a 2d grid of pure data, and pass that to LdtkImport. Along with a properly made .ldtk file, LdtkImport will run the rule matching process, and give you the data that tells you which tiles in a tilesheet should be drawn where, how many times, what their Z-order is, etc.
+Preferably, you should pair LdtkImport with a procedural map generation library: take the output of the procedural map generator, which would just be a 2d grid of pure data, and pass that to LdtkImport. Along with a properly made .ldtk file, LdtkImport will run the rule pattern matching process, and give you the data that tells you which tiles in a tilesheet should be drawn where, how many times, what their Z-order is, etc.
 
-This also opens up the potential for a runtime map editor for user-generated content, though that is beyond the scope of this importing library.
+This also opens up the potential for a runtime map editor for modders and user-generated content, though that is beyond the scope of this importing library.
 
 
 # Building
 
 Right now, only Visual Studio project files exist, but there is nothing Windows-specific in the code. I plan to eventually add CMake files for ease of porting, once I understand CMake.
-
-LdtkImport is designed to work on at least C++14 standard.
 
 
 ## Dependencies
@@ -45,7 +43,7 @@ Unit tests are included (in the tests subfolder) using the [catch2](https://gith
 
 # Reference Manual
 
-There is no reference manual yet, but all the public classes/structs and methods have Doxygen comments.
+There is no reference manual yet, but all the public classes/structs and public methods have Doxygen comments.
 
 If you are not familiar with the structure of an .ldtk file, it's recommended to read the [official documentation](https://ldtk.io/docs/game-dev/json-overview/) first.
 
@@ -54,6 +52,6 @@ If you are not familiar with the structure of an .ldtk file, it's recommended to
 
 As mentioned, this library only supports a subset of the [LDtk file schema](https://ldtk.io/files/JSON_SCHEMA.json). Just to name a few of the limitations: it doesn't import regular tile layers, entities (and that includes enum properties), or world data at all. It doesn't import the existing Level data (i.e. layer instances), preferring Levels to be generated at runtime. It assumes all layers/tilesets use the same grid size. It also uses only one IntGrid per Level.
 
-This wasn't exactly a deliberate design goal. It was more of a "hmm well my game doesn't need this LDtk feature, so I'm going to ignore it" series of spontaneous decisions (I would be using procedural map generation a lot, so it made no sense to be placing entities manually, ergo I ignored entities completely).
+This wasn't exactly a deliberate design goal. It was more of "hmm well my game doesn't need this LDtk feature, so I'm going to ignore it" series of spontaneous decisions (I would be using procedural map generation a lot, so it made no sense to be placing entities manually, ergo I ignored entities completely).
 
 So, if you want to improve this library by adding the missing features, then go ahead and fork it and/or submit a pull request.
