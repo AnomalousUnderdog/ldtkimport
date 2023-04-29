@@ -31,7 +31,7 @@ namespace ldtkimport
 // note: C++20 has std::source_location
 // g++ has the non-standard __PRETTY_FUNCTION__
 
-#if !defined(NDEBUG) && defined(LDTK_ASSERTS)
+#if !defined(NDEBUG) && defined(LDTK_IMPORT_ASSERTS)
 #  define ASSERT(condition, message) \
    do { \
       if (! (condition)) { \
@@ -44,7 +44,7 @@ namespace ldtkimport
 #  define ASSERT(condition, message) ((void)0)
 #endif
 
-#if !defined(NDEBUG) && defined(LDTK_ASSERTS)
+#if !defined(NDEBUG) && defined(LDTK_IMPORT_ASSERTS)
 #  define ASSERT_THROW(condition, objectThrown, message) \
    do { \
       if (! (condition)) { \
