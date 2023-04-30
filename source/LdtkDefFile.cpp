@@ -140,7 +140,7 @@ bool LdtkDefFile::getRuleGroupOfRule(int ruleUid, const RuleGroup *&result) cons
 
 #define USE_IFSTREAM
 
-void LdtkDefFile::loadFromFile(
+bool LdtkDefFile::loadFromFile(
 #if !defined(NDEBUG) && LDTK_IMPORT_DEBUG_RULE > 0
    RulesLog &rulesLog,
 #endif
@@ -153,7 +153,7 @@ void LdtkDefFile::loadFromFile(
    {
       //lua_pushboolean(L, 0);
       //lua_pushstring(L, "error: file could not be opened: \"%s\"", got_string_param);
-      return;
+      return false;
    }
 
    fseek(f, 0, SEEK_END);
@@ -166,7 +166,7 @@ void LdtkDefFile::loadFromFile(
 
    if (fsize != bytesRead)
    {
-      return;
+      return false;
    }
 
    auto jsonText = buffer.get();
@@ -178,7 +178,7 @@ void LdtkDefFile::loadFromFile(
 
    if (!file.good())
    {
-      return;
+      return false;
    }
 
    std::stringstream bufferstream;
@@ -197,6 +197,8 @@ void LdtkDefFile::loadFromFile(
       rulesLog,
 #endif
       jsonText, jsonTextLen, loadDeactivatedContent, ldtkFile);
+
+   return true;
 }
 
 const char *LAYER_TYPE_AUTO_LAYER = "AutoLayer";

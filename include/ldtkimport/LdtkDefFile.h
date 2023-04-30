@@ -67,7 +67,7 @@ public:
     *                                    the file. Some level designers have tests/experiments that they
     *                                    keep deactivated, so you might not want to bother with those.
     */
-   void loadFromFile(
+   bool loadFromFile(
 #if !defined(NDEBUG) && LDTK_IMPORT_DEBUG_RULE > 0
       RulesLog &rulesLog,
 #endif
