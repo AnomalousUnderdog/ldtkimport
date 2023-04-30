@@ -42,6 +42,7 @@ mono_crash.*
 build/
 x64/
 /test/ldtkimport-test/
+*.o
 
 # Roslyn cache directories
 *.ide/
