@@ -66,7 +66,14 @@ struct RuleLog
    std::string stampDebugInfo;
 };
 
-using RuleLogs_t = std::unordered_map<uid_t, RuleLog>;
+struct RulesLog
+{
+   std::unordered_map<uid_t, RuleLog> rule;
+
+   using RulesInCell_t = std::vector<uid_t>; // stack of rule uids, shows which rules were applied to this cell
+   using RulesInGrid_t = std::vector<RulesInCell_t>; // 2d grid packed in 1d vector, this is the tilegrid
+   std::vector<RulesInGrid_t> tileGrid; // collection of tilegrids (per layer)
+};
 
 inline std::ostream &operator<<(std::ostream &os, const RuleLog &rule)
 {
@@ -177,7 +184,7 @@ public:
     */
    void applyRule(
 #if !defined(NDEBUG) && LDTK_IMPORT_DEBUG_RULE > 0
-      RuleLog &ruleLog,
+      RuleLog &ruleLog, RulesLog::RulesInGrid_t &tileGridLog,
 #endif
       TileGrid &tileGrid, const IntGrid &cells, const int randomSeed, const uint8_t rulePriority, const uint8_t runSettings) const;
 

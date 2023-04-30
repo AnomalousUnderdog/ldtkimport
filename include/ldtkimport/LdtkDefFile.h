@@ -55,7 +55,7 @@ public:
     */
    void loadFromText(
 #if !defined(NDEBUG) && LDTK_IMPORT_DEBUG_RULE > 0
-      RuleLogs_t &rulesLog,
+      RulesLog &rulesLog,
 #endif
       const char *ldtkText, size_t textLength, bool loadDeactivatedContent, const char *filename);
 
@@ -69,7 +69,7 @@ public:
     */
    void loadFromFile(
 #if !defined(NDEBUG) && LDTK_IMPORT_DEBUG_RULE > 0
-      RuleLogs_t &rulesLog,
+      RulesLog &rulesLog,
 #endif
       const char *ldtkFile, bool loadDeactivatedContent);
 
@@ -87,7 +87,7 @@ public:
     */
    void preProcess(
 #if !defined(NDEBUG) && LDTK_IMPORT_DEBUG_RULE > 0
-      RuleLogs_t &rulesLog,
+      RulesLog &rulesLog,
 #endif
       bool preProcessDeactivatedContent = false);
 
@@ -128,7 +128,7 @@ public:
     */
    void runRules(
 #if !defined(NDEBUG) && LDTK_IMPORT_DEBUG_RULE > 0
-      RuleLogs_t &rulesLog,
+      RulesLog &rulesLog,
 #endif
       Level &level, const uint8_t runSettings = RunSettings::None) const;
 
@@ -141,7 +141,7 @@ public:
     */
    void runRulesOnLayer(
 #if !defined(NDEBUG) && LDTK_IMPORT_DEBUG_RULE > 0
-      RuleLogs_t &rulesLog,
+      RulesLog &rulesLog,
 #endif
       Level &level, const size_t layerIdx, const uint32_t randomSeed, const uint8_t runSettings = RunSettings::None) const;
 

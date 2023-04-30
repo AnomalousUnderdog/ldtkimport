@@ -142,7 +142,7 @@ bool LdtkDefFile::getRuleGroupOfRule(int ruleUid, const RuleGroup *&result) cons
 
 void LdtkDefFile::loadFromFile(
 #if !defined(NDEBUG) && LDTK_IMPORT_DEBUG_RULE > 0
-   RuleLogs_t &rulesLog,
+   RulesLog &rulesLog,
 #endif
    const char *ldtkFile, bool loadDeactivatedContent)
 {
@@ -211,7 +211,7 @@ const char *TILE_MODE_STAMP = "Stamp";
 
 void LdtkDefFile::loadFromText(
 #if !defined(NDEBUG) && LDTK_IMPORT_DEBUG_RULE > 0
-   RuleLogs_t &rulesLog,
+   RulesLog &rulesLog,
 #endif
    const char *ldtkText, size_t textLength, bool loadDeactivatedContent, const char *filename)
 {
@@ -552,7 +552,7 @@ void LdtkDefFile::loadFromText(
 
 void LdtkDefFile::preProcess(
 #if !defined(NDEBUG) && LDTK_IMPORT_DEBUG_RULE > 0
-   RuleLogs_t &rulesLog,
+   RulesLog &rulesLog,
 #endif
    bool preProcessDeactivatedContent)
 {
@@ -605,11 +605,11 @@ void LdtkDefFile::preProcess(
          for (auto rule = ruleGroup->rules.begin(), ruleEnd = ruleGroup->rules.end(); rule != ruleEnd; ++rule)
          {
 #if !defined(NDEBUG) && LDTK_IMPORT_DEBUG_RULE > 0
-            if (rulesLog.count(rule->uid) == 0)
+            if (rulesLog.rule.count(rule->uid) == 0)
             {
-               rulesLog.insert(std::make_pair(rule->uid, RuleLog()));
+               rulesLog.rule.insert(std::make_pair(rule->uid, RuleLog()));
             }
-            rulesLog[rule->uid].stampDebugInfo = "";
+            rulesLog.rule[rule->uid].stampDebugInfo = "";
 #endif
 
             if (!rule->active && !preProcessDeactivatedContent)
@@ -750,7 +750,7 @@ void LdtkDefFile::preProcess(
                "For rule " << rule->uid << ", stampTileOffsets size should match tileIds size at this point. stampTileOffsets.size(): " << rule->stampTileOffsets.size() << " tileIds.size(): " << rule->tileIds.size());
 
 #if !defined(NDEBUG) && LDTK_IMPORT_DEBUG_RULE > 0
-            rulesLog[rule->uid].stampDebugInfo = stampDebugLog.str();
+            rulesLog.rule[rule->uid].stampDebugInfo = stampDebugLog.str();
 #endif
          } // for Rule
       } // for RuleGroup
@@ -795,7 +795,7 @@ bool LdtkDefFile::isValid() const
 
 void LdtkDefFile::runRules(
 #if !defined(NDEBUG) && LDTK_IMPORT_DEBUG_RULE > 0
-   RuleLogs_t &rulesLog,
+   RulesLog &rulesLog,
 #endif
    Level &level, const uint8_t runSettings) const
 {
@@ -813,6 +813,11 @@ void LdtkDefFile::runRules(
 
    ASSERT(level.getTileGridCount() == m_layers.size(), "TileGrid count of Level should match count of Layers after calling Level::setTileGridCount");
 
+#if !defined(NDEBUG) && LDTK_IMPORT_DEBUG_RULE > 0
+   rulesLog.tileGrid.resize(m_layers.size(), RulesLog::RulesInGrid_t());
+#endif
+
+
    for (size_t layerIdx = 0, end = m_layers.size(); layerIdx < end; ++layerIdx)
    {
       uint32_t randomSeed;
@@ -824,6 +829,10 @@ void LdtkDefFile::runRules(
       {
          randomSeed = m_layers[layerIdx].initialRandomSeed;
       }
+
+#if !defined(NDEBUG) && LDTK_IMPORT_DEBUG_RULE > 0
+      rulesLog.tileGrid[layerIdx].resize(level.getIntGrid().size(), RulesLog::RulesInCell_t());
+#endif
 
       runRulesOnLayer(
 #if !defined(NDEBUG) && LDTK_IMPORT_DEBUG_RULE > 0
@@ -861,7 +870,7 @@ bool LdtkDefFile::ensureValidForRules(Level &level) const
 
 void LdtkDefFile::runRulesOnLayer(
 #if !defined(NDEBUG) && LDTK_IMPORT_DEBUG_RULE > 0
-   RuleLogs_t &rulesLog,
+   RulesLog &rulesLog,
 #endif
    Level &level, const size_t layerIdx, const uint32_t randomSeed, const uint8_t runSettings) const
 {
@@ -873,6 +882,16 @@ void LdtkDefFile::runRulesOnLayer(
    tileGrid.setLayerUid(layer.uid);
 
    uint8_t rulePriority = 0;
+
+#if !defined(NDEBUG) && LDTK_IMPORT_DEBUG_RULE > 0
+   for (int cellY = 0; cellY < intGrid.getHeight(); ++cellY)
+   {
+      for (int cellX = 0; cellX < intGrid.getWidth(); ++cellX)
+      {
+         rulesLog.tileGrid[layerIdx][GridUtility::getIndex(cellX, cellY, intGrid.getWidth())].clear();
+      }
+   }
+#endif
 
    for (auto ruleGroup = layer.ruleGroups.begin(), ruleGroupEnd = layer.ruleGroups.end(); ruleGroup != ruleGroupEnd; ++ruleGroup)
    {
@@ -901,15 +920,15 @@ void LdtkDefFile::runRulesOnLayer(
          }
 
 #if !defined(NDEBUG) && LDTK_IMPORT_DEBUG_RULE > 0
-         if (rulesLog.count(rule->uid) == 0)
+         if (rulesLog.rule.count(rule->uid) == 0)
          {
-            rulesLog.insert(std::make_pair(rule->uid, RuleLog()));
+            rulesLog.rule.insert(std::make_pair(rule->uid, RuleLog()));
          }
 #endif
 
          rule->applyRule(
 #if !defined(NDEBUG) && LDTK_IMPORT_DEBUG_RULE > 0
-            rulesLog[rule->uid],
+            rulesLog.rule[rule->uid], rulesLog.tileGrid[layerIdx],
 #endif
             tileGrid, intGrid, tileGrid.getRandomSeed(), rulePriority, runSettings);
 

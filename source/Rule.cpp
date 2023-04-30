@@ -275,7 +275,7 @@ int8_t Rule::passesRule(
 
 void Rule::applyRule(
 #if !defined(NDEBUG) && LDTK_IMPORT_DEBUG_RULE > 0
-   RuleLog &ruleLog,
+   RuleLog &ruleLog, RulesLog::RulesInGrid_t &tileGridLog,
 #endif
    TileGrid &tileGrid, const IntGrid &cells, const int randomSeed, const uint8_t rulePriority, const uint8_t runSettings) const
 {
@@ -334,6 +334,10 @@ void Rule::applyRule(
                }
 
                uint8_t flags = static_cast<uint8_t>(ruleMatchResult) | breakOnMatchFlag;
+
+#if !defined(NDEBUG) && LDTK_IMPORT_DEBUG_RULE > 0
+               tileGridLog[GridUtility::getIndex(cellX, cellY, cells.getWidth())].push_back(uid);
+#endif
 
                tileGrid.putTile(tileId, cellX, cellY, flags, rulePriority);
                break;
@@ -398,6 +402,10 @@ void Rule::applyRule(
                      flags &= ~TILE_OFFSET_UP;
                      flags |= TILE_OFFSET_DOWN;
                   }
+
+#if !defined(NDEBUG) && LDTK_IMPORT_DEBUG_RULE > 0
+                  tileGridLog[GridUtility::getIndex(locationX, locationY, cells.getWidth())].push_back(uid);
+#endif
 
                   tileGrid.putTile(tileIds[tileIdx], locationX, locationY, flags, rulePriority);
                } // for tileId
