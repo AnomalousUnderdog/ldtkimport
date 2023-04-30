@@ -23,15 +23,35 @@ static const int RULE_PATTERN_NOTHING = -1000001;
 namespace RunSettings
 {
 
+/**
+ *  @brief Use defaults when running rules on an IntGrid.
+ */
 static const uint8_t None = 0;
+
+/**
+ *  @brief Pass this to LdtkDefFile::runRules to generate a new variation of tiles.
+ *  This requires that the ldtk file has rules that use random chance.
+ */
 static const uint8_t RandomizeSeeds = 1 << 0;
+
+/**
+ *  @brief Pass this to LdtkDefFile::runRules to make use of an algorithm that
+ *  considers all stamp tiles final, preventing new tiles from being placed in
+ *  those cells. This shouldn't be used at all if any stamp has transparency.
+ */
 static const uint8_t FasterStampBreakOnMatch = 1 << 1;
 
+/**
+ *  @brief Whether a runSettings int has RandomizeSeeds.
+ */
 static inline bool hasRandomizeSeeds(const uint8_t flags)
 {
    return (flags & RandomizeSeeds) == RandomizeSeeds;
 }
 
+/**
+ *  @brief Whether a runSettings int has FasterStampBreakOnMatch.
+ */
 static inline bool hasFasterStampBreakOnMatch(const uint8_t flags)
 {
    return (flags & FasterStampBreakOnMatch) == FasterStampBreakOnMatch;
@@ -116,7 +136,7 @@ inline std::ostream &operator<<(std::ostream &os, const RuleLog &rule)
 /**
  *  @brief Specifies what tile/s to draw for cells that match a specific pattern.
  *
- *  @details Each cells has an IntGridValue, and a Rule looks for a specific combination
+ *  @details Each cell has an IntGridValue, and a Rule looks for a specific combination
  *  of these IntGridValues in a particular shape.
  *
  *  @see Documentation at https://ldtk.io/json/#ldtk-AutoRuleDef
