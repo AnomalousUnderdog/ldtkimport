@@ -103,6 +103,40 @@ bool LdtkDefFile::getLayer(int layerDefUid, Layer *&result)
    return false;
 }
 
+bool LdtkDefFile::getLayer(int layerDefUid, const Layer *&result) const
+{
+   for (auto i = m_layers.cbegin(), end = m_layers.cend(); i != end; ++i)
+   {
+      if (i->uid == layerDefUid)
+      {
+         result = &*i;
+         return true;
+      }
+   }
+
+   return false;
+}
+
+
+bool LdtkDefFile::getRuleGroupOfRule(int ruleUid, const RuleGroup *&result) const
+{
+   for (auto i = m_layers.cbegin(), end = m_layers.cend(); i != end; ++i)
+   {
+      for (auto r = i->ruleGroups.cbegin(), rEnd = i->ruleGroups.cend(); r != rEnd; ++r)
+      {
+         for (auto rule = r->rules.cbegin(), ruleEnd = r->rules.cend(); rule != ruleEnd; ++rule)
+         {
+            if (rule->uid == ruleUid)
+            {
+               result = &*r;
+               return true;
+            }
+         }
+      }
+   }
+
+   return false;
+}
 
 #define USE_IFSTREAM
 

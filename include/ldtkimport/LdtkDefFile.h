@@ -171,6 +171,22 @@ public:
     */
    bool getLayer(int layerDefUid, Layer *&result);
 
+   /**
+    *  @brief Find a Layer with the given unique id (const version).
+    *  @param[in] layerDefUid Unique id of the Layer to get.
+    *  @param[out] result Where the found Layer will be in, if any. Use the return value to check.
+    *  @return true means the Layer was found, false if not.
+    */
+   bool getLayer(int layerDefUid, const Layer *&result) const;
+
+   /**
+    *  @brief Get the RuleGroup that owns the specified Rule. This will search through all Layers.
+    *  @param[in] ruleUid Unique id of the Rule.
+    *  @param[out] result Where the found RuleGroup will be in, if any. Use the return value to check.
+    *  @return true means the RuleGroup was found, false if not.
+    */
+   bool getRuleGroupOfRule(int ruleUid, const RuleGroup *&result) const;
+
    // ---------------------------------------------------------------------
    // Note: These next set of functions are used for debugging, to
    // browse through the rules that the LdtkDefFile has.
