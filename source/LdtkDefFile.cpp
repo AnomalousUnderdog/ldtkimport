@@ -841,7 +841,15 @@ void LdtkDefFile::runRules(
          rulesLog,
 #endif
          level, layerIdx, randomSeed, runSettings);
+
+#if !defined(NDEBUG) && LDTK_IMPORT_DEBUG_RULE > 0
+      std::cout << "Finished running rules for layer idx " << layerIdx << std::endl;
+#endif
    } // for Layer
+
+#if !defined(NDEBUG) && LDTK_IMPORT_DEBUG_RULE > 0
+   std::cout << "Finished running all rules on all layers" << std::endl;
+#endif
 }
 
 bool LdtkDefFile::ensureValidForRules(Level &level) const
@@ -926,6 +934,7 @@ void LdtkDefFile::runRulesOnLayer(
          {
             rulesLog.rule.insert(std::make_pair(rule->uid, RuleLog()));
          }
+         std::cout << "Running Rule " << rule->uid << " of RuleGroup \"" << ruleGroup->name << "\" on layer idx " << layerIdx << " with random seed is " << randomSeed << std::endl;
 #endif
 
          rule->applyRule(
