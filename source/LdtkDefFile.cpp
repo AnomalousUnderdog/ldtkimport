@@ -266,6 +266,25 @@ void LdtkDefFile::loadFromText(
 
    m_fileVersion = yyjson_get_str(fileVersion);
 
+   int major, minor, patch;
+#if defined(__STDC_LIB_EXT1__) || defined(_MSC_VER)
+   int successCount = sscanf_s(m_fileVersion.c_str(), "%d.%d.%d", &major, &minor, &patch);
+#else
+   int successCount = sscanf(m_fileVersion.c_str(), "%d.%d.%d", &major, &minor, &patch);
+#endif
+   if (successCount >= 3)
+   {
+      m_versionMajor = major;
+      m_versionMinor = minor;
+      m_versionPatch = patch;
+   }
+   else
+   {
+      m_versionMajor = -1;
+      m_versionMinor = -1;
+      m_versionPatch = -1;
+   }
+
    // ---------------------------------------------------------------------------------
 
    auto defs = yyjson_obj_get(root, "defs");

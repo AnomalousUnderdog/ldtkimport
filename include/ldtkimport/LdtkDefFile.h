@@ -431,6 +431,47 @@ private:
     */
    void setLayerInitialSeed(int layerDefUid, int newInitialSeed);
 
+   bool isVersionAtLeast(const int16_t major, const int16_t minor, const int16_t patch) const
+   {
+      if (m_versionMajor > major)
+      {
+         // file major version is beyond what is asked for
+         return true;
+      }
+      if (m_versionMajor < major)
+      {
+         // file major version is below what is asked for
+         return false;
+      }
+
+      // at this point, file major version matches what is asked for
+      if (m_versionMinor > minor)
+      {
+         // file minor version is beyond what is asked for
+         return true;
+      }
+      if (m_versionMinor < minor)
+      {
+         // file minor version is below what is asked for
+         return false;
+      }
+
+      // at this point, file minor version matches what is asked for
+      if (m_versionPatch > patch)
+      {
+         // file patch version is beyond what is asked for
+         return true;
+      }
+      if (m_versionPatch < patch)
+      {
+         // file patch version is below what is asked for
+         return false;
+      }
+
+      // file version is exactly what is asked for
+      return true;
+   }
+
    // ---------------------------------------------------------------------
 
    /**
@@ -448,6 +489,10 @@ private:
     *  @brief https://ldtk.io/json/#ldtk-ProjectJson;jsonVersion
     */
    std::string m_fileVersion;
+
+   int16_t m_versionMajor;
+   int16_t m_versionMinor;
+   int16_t m_versionPatch;
 
    /**
     *  @brief Normally, Background Color resides in the LdtkDefFile's "Level" section.
