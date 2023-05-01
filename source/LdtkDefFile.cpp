@@ -682,7 +682,7 @@ void LdtkDefFile::preProcess(
                int16_t x, y;
                tileset->getCoordinates(*tileId, x, y);
 
-               uint8_t flags = TILE_NO_FLAGS;
+               uint8_t flags = TileFlags::NoFlags;
 
                // The x and y offsets are measured in "grid-space", not pixels.
                // So if a pivot is 0.5 and causes the tiles to be in-between the grid,
@@ -713,7 +713,7 @@ void LdtkDefFile::preProcess(
 
                if (horizontalAlignmentFraction > 0.0f)
                {
-                  flags |= TILE_OFFSET_LEFT;
+                  flags |= TileFlags::LeftOffset;
                }
 
                float verticalAlignmentOffsetWhole;
@@ -721,7 +721,7 @@ void LdtkDefFile::preProcess(
 
                if (verticalAlignmentOffsetFraction > 0.0f)
                {
-                  flags |= TILE_OFFSET_UP;
+                  flags |= TileFlags::UpOffset;
                }
 
                // ------------------------------
@@ -735,11 +735,11 @@ void LdtkDefFile::preProcess(
 
 #if !defined(NDEBUG) && LDTK_IMPORT_DEBUG_RULE > 0
                stampDebugLog << "for tile id " << *tileId << ": offset: (" << o.x << ", " << o.y << ")";
-               if (tile::hasOffsetLeft(flags))
+               if (TileFlags::hasOffsetLeft(flags))
                {
                   stampDebugLog << " offsetX (h align: " << horizontalAlignmentWhole << " f: " << horizontalAlignmentFraction << ")";
                }
-               if (tile::hasOffsetUp(flags))
+               if (TileFlags::hasOffsetUp(flags))
                {
                   stampDebugLog << " offsetY (v align: " << verticalAlignmentOffsetWhole << " f: " << verticalAlignmentOffsetFraction << ")";
                }

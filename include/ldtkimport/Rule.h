@@ -106,23 +106,23 @@ inline std::ostream &operator<<(std::ostream &os, const RuleLog &rule)
    for (auto matched = rule.matchedCells.cbegin(), matchedEnd = rule.matchedCells.cend(); matched != matchedEnd; ++matched)
    {
       os << "(" << matched->x << ", " << matched->y << ") ";
-      if (tile::hasOffsetLeft(matched->flags))
+      if (TileFlags::hasOffsetLeft(matched->flags))
       {
          os << "OffsetLeft ";
       }
-      if (tile::hasOffsetUp(matched->flags))
+      if (TileFlags::hasOffsetUp(matched->flags))
       {
          os << "OffsetUp ";
       }
-      if (tile::isFlippedX(matched->flags))
+      if (TileFlags::isFlippedX(matched->flags))
       {
          os << "FlippedX ";
       }
-      if (tile::isFlippedY(matched->flags))
+      if (TileFlags::isFlippedY(matched->flags))
       {
          os << "FlippedY ";
       }
-      if (tile::isFinal(matched->flags))
+      if (TileFlags::isFinal(matched->flags))
       {
          os << "Final ";
       }
@@ -510,9 +510,9 @@ public:
        */
       uint8_t flags;
 
-      bool hasAnyOffset() const
+      bool hasEitherLeftOrUpOffset() const
       {
-         return tile::hasOffsetLeft(flags) || tile::hasOffsetUp(flags);
+         return TileFlags::hasOffsetLeft(flags) || TileFlags::hasOffsetUp(flags);
       }
    };
 

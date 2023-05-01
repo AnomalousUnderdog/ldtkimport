@@ -165,15 +165,20 @@ bool Rule::matchesCell(
 
 // -----------------------------------------------------------------------------------------------------
 
+namespace RuleResult
+{
+
 /**
  *  @brief Return value given by passesRule to indicate that the Rule did not match.
  */
-static const int8_t RULE_FAIL = -1;
+static const int8_t Fail = -1;
 
 /**
  *  @brief Return value given by passesRule to indicate that the non-flipped version of the Rule matched.
  */
-static const int8_t RULE_SUCCESS_NORMAL = 0;
+static const int8_t Success = 0;
+
+}
 
 // -----------------------------------------------------------------------------------------------------
 
@@ -196,7 +201,7 @@ int8_t Rule::passesRule(
 #if !defined(NDEBUG) && LDTK_IMPORT_DEBUG_RULE > 1
       ruleLog.matchedCells.push_back(DebugMatchCell{ cellX, cellY, 0, std::string("Skipped due to Y Modulo") });
 #endif
-      return RULE_FAIL;
+      return RuleResult::Fail;
    }
 
    if (checker == CheckerMode::Vertical && ((cellY + ((cellX / xModulo) % 2)) % yModulo) != 0)
@@ -204,7 +209,7 @@ int8_t Rule::passesRule(
 #if !defined(NDEBUG) && LDTK_IMPORT_DEBUG_RULE > 1
       ruleLog.matchedCells.push_back(DebugMatchCell{ cellX, cellY, 0, std::string("Skipped due to Checker Y Modulo") });
 #endif
-      return RULE_FAIL;
+      return RuleResult::Fail;
    }
 
    if (checker != CheckerMode::Horizontal && ((cellX - xModuloOffset) % xModulo) != 0)
@@ -212,7 +217,7 @@ int8_t Rule::passesRule(
 #if !defined(NDEBUG) && LDTK_IMPORT_DEBUG_RULE > 1
       ruleLog.matchedCells.push_back(DebugMatchCell{ cellX, cellY, 0, std::string("Skipped due to X Modulo") });
 #endif
-      return RULE_FAIL;
+      return RuleResult::Fail;
    }
 
    if (checker == CheckerMode::Horizontal && ((cellX + ((cellY / yModulo) % 2)) % xModulo) != 0)
@@ -220,7 +225,7 @@ int8_t Rule::passesRule(
 #if !defined(NDEBUG) && LDTK_IMPORT_DEBUG_RULE > 1
       ruleLog.matchedCells.push_back(DebugMatchCell{ cellX, cellY, 0, std::string("Skipped due to Checker X Modulo") });
 #endif
-      return RULE_FAIL;
+      return RuleResult::Fail;
    }
 
 #if !defined(NDEBUG) && LDTK_IMPORT_DEBUG_RULE > 1
@@ -235,7 +240,7 @@ int8_t Rule::passesRule(
 #endif
       cells, cellX, cellY, 1, 1, randomSeed))
    {
-      return RULE_SUCCESS_NORMAL;
+      return RuleResult::Success;
    }
 
    if (flipX && flipY && matchesCell(
@@ -244,7 +249,7 @@ int8_t Rule::passesRule(
 #endif
       cells, cellX, cellY, -1, -1, randomSeed))
    {
-      return TILE_FLIPPED_X | TILE_FLIPPED_Y;
+      return TileFlags::FlippedX | TileFlags::FlippedY;
    }
 
    if (flipX && matchesCell(
@@ -253,7 +258,7 @@ int8_t Rule::passesRule(
 #endif
       cells, cellX, cellY, -1, 1, randomSeed))
    {
-      return TILE_FLIPPED_X;
+      return TileFlags::FlippedX;
    }
 
    if (flipY && matchesCell(
@@ -262,13 +267,14 @@ int8_t Rule::passesRule(
 #endif
       cells, cellX, cellY, 1, -1, randomSeed))
    {
-      return TILE_FLIPPED_Y;
+      return TileFlags::FlippedY;
    }
 
+   // no version of the rule pattern matched
 #if !defined(NDEBUG) && LDTK_IMPORT_DEBUG_RULE > 1
    ruleLog.matchedCells.push_back(DebugMatchCell{ cellX, cellY, 0, debugInfo.str() });
 #endif
-   return RULE_FAIL;
+   return RuleResult::Fail;
 }
 
 // -----------------------------------------------------------------------------------------------------
@@ -291,7 +297,7 @@ void Rule::applyRule(
 
    for (int cellY = 0; cellY < cells.getHeight(); ++cellY)
    {
-      uint8_t breakOnMatchFlag = breakOnMatch ? TILE_FINAL : TILE_NO_FLAGS;
+      uint8_t breakOnMatchFlag = breakOnMatch ? TileFlags::Final : TileFlags::NoFlags;
 
       for (int cellX = 0; cellX < cells.getWidth(); ++cellX)
       {
@@ -303,13 +309,15 @@ void Rule::applyRule(
             continue;
          }
 
+         // return value can either be a RuleResult,
+         // or one of the Flipped values in TileFlags
          int8_t ruleMatchResult = passesRule(
 #if !defined(NDEBUG) && LDTK_IMPORT_DEBUG_RULE > 1
             ruleLog,
 #endif
             cells, cellX, cellY, randomSeed);
 
-         if (ruleMatchResult == RULE_FAIL)
+         if (ruleMatchResult == RuleResult::Fail)
          {
             continue;
          }
@@ -356,11 +364,12 @@ void Rule::applyRule(
                   bool giveBreakOnMatch;
                   if (RunSettings::hasFasterStampBreakOnMatch(runSettings))
                   {
-                     giveBreakOnMatch = (offset.x == 0 && offset.y == 0) || !offset.hasAnyOffset();
+                     // at this point, the offsets don't have any right or down offset so we only specifically check for left or up
+                     giveBreakOnMatch = (offset.x == 0 && offset.y == 0) || !offset.hasEitherLeftOrUpOffset();
                   }
                   else
                   {
-                     giveBreakOnMatch = (offset.x == 0 && offset.y == 0) && !offset.hasAnyOffset();
+                     giveBreakOnMatch = (offset.x == 0 && offset.y == 0) && !offset.hasEitherLeftOrUpOffset();
                   }
                   if (giveBreakOnMatch)
                   {
@@ -388,19 +397,19 @@ void Rule::applyRule(
                   // If so, we need to move the tile there and switch the left offset to a right offset.
                   // Visually, it will be in the same position, it's just that we need to do this to properly
                   // enforce z-order, so that a higher priority rule shows up on top of this rule.
-                  if (tile::hasOffsetLeft(flags) && locationX > 0 && tileGrid.getHighestPriority(locationX - 1, locationY) < rulePriority)
+                  if (TileFlags::hasOffsetLeft(flags) && locationX > 0 && tileGrid.getHighestPriority(locationX - 1, locationY) < rulePriority)
                   {
                      --locationX;
-                     flags &= ~TILE_OFFSET_LEFT;
-                     flags |= TILE_OFFSET_RIGHT;
+                     flags &= ~TileFlags::LeftOffset;
+                     flags |= TileFlags::RightOffset;
                   }
 
                   // Do the same in the Y-axis.
-                  if (tile::hasOffsetUp(flags) && locationY > 0 && tileGrid.getHighestPriority(locationX, locationY - 1) < rulePriority)
+                  if (TileFlags::hasOffsetUp(flags) && locationY > 0 && tileGrid.getHighestPriority(locationX, locationY - 1) < rulePriority)
                   {
                      --locationY;
-                     flags &= ~TILE_OFFSET_UP;
-                     flags |= TILE_OFFSET_DOWN;
+                     flags &= ~TileFlags::UpOffset;
+                     flags |= TileFlags::DownOffset;
                   }
 
 #if !defined(NDEBUG) && LDTK_IMPORT_DEBUG_RULE > 0

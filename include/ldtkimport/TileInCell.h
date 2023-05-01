@@ -18,7 +18,7 @@ struct TileInCell
 {
    TileInCell() :
       tileId(0),
-      flags(TILE_NO_FLAGS),
+      flags(TileFlags::NoFlags),
       priority(0)
    {
    }
@@ -126,37 +126,37 @@ struct TileInCell
 
    bool hasOffsetLeft() const
    {
-      return tile::hasOffsetLeft(flags);
+      return TileFlags::hasOffsetLeft(flags);
    }
 
    bool hasOffsetUp() const
    {
-      return tile::hasOffsetUp(flags);
+      return TileFlags::hasOffsetUp(flags);
    }
 
    bool hasOffsetRight() const
    {
-      return tile::hasOffsetRight(flags);
+      return TileFlags::hasOffsetRight(flags);
    }
 
    bool hasOffsetDown() const
    {
-      return tile::hasOffsetDown(flags);
+      return TileFlags::hasOffsetDown(flags);
    }
 
    bool isFlippedX() const
    {
-      return tile::isFlippedX(flags);
+      return TileFlags::isFlippedX(flags);
    }
 
    bool isFlippedY() const
    {
-      return tile::isFlippedY(flags);
+      return TileFlags::isFlippedY(flags);
    }
 
    bool isFinal() const
    {
-      return tile::isFinal(flags);
+      return TileFlags::isFinal(flags);
    }
 };
 
