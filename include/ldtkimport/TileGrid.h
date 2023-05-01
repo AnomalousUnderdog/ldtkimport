@@ -65,10 +65,12 @@ public:
     *  @param[in] tileId The Tile Id to place at the location.
     *  @param[in] cellX X-coordinate of the location. This value is in "grid-space", not pixels. Starts at 0, which is at the left edge of the grid.
     *  @param[in] cellY Y-coordinate of the location. This value is in "grid-space", not pixels. Starts at 0, which is at the top edge of the grid.
+    *  @param[in] posXOffset Additional position offset in x-axis. This value is in pixels.
+    *  @param[in] posYOffset Additional position offset in y-axis. This value is in pixels.
     *  @param[in] flags Bitwise flags of indicators how the tile should be drawn.
     *  @param[in] priority Only used in the rule matching process to fix problems with z-order of stamp tiles.
     */
-   void putTile(tileid_t tileId, int cellX, int cellY, uint8_t flags, uint8_t priority)
+   void putTile(tileid_t tileId, int cellX, int cellY, int8_t posXOffset, int8_t posYOffset, uint8_t flags, uint8_t priority)
    {
       ASSERT_THROW(cellX >= 0, std::out_of_range, "supplied cellX index is negative: " << cellX);
       ASSERT_THROW(cellY >= 0, std::out_of_range, "supplied cellY index is negative: " << cellY);
@@ -80,7 +82,7 @@ public:
       ASSERT_THROW(cellIdx >= 0, std::out_of_range, "supplied index is negative: " << cellIdx);
       ASSERT_THROW(cellIdx < m_grid.size(), std::out_of_range, "supplied index is beyond size: " << cellIdx << " (size: " << m_grid.size() << ")");
 
-      m_grid[cellIdx].push_back(TileInCell(tileId, flags, priority));
+      m_grid[cellIdx].push_back(TileInCell(tileId, posXOffset, posYOffset, flags, priority));
    }
 
    /**

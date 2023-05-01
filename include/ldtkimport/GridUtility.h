@@ -33,6 +33,21 @@ static inline int16_t getRandomIndex(int seed, int x, int y, int16_t max)
    return (h ^ (h >> 16)) % max;
 }
 
+static inline int getRandomIndex(int seed, int x, int y, int max)
+{
+   // Based on xxhash
+   // Source: https://stackoverflow.com/a/37221804/1377948
+   // Note: h is meant to overflow on purpose
+   int32_t h = seed + (x * 374761393) + (y * 668265263); // all constants are prime
+   h = (h ^ (h >> 13)) * 1274126177;
+   return (h ^ (h >> 16)) % max;
+}
+
+static inline int getRandomIndex(int seed, int x, int y, int min, int max)
+{
+   return getRandomIndex(seed, x, y, max - min + 1) + min;
+}
+
 /**
  *  @brief Assuming you have a 1-dimensional array used as a 2d grid,
  *  this converts an x, y coordinate to the array index to allow accessing it with the [] operator.

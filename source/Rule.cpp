@@ -283,7 +283,7 @@ void Rule::applyRule(
 #if !defined(NDEBUG) && LDTK_IMPORT_DEBUG_RULE > 0
    RuleLog &ruleLog, RulesLog::RulesInGrid_t &tileGridLog,
 #endif
-   TileGrid &tileGrid, const IntGrid &cells, const int randomSeed, const uint8_t rulePriority, const uint8_t runSettings) const
+   TileGrid &tileGrid, const IntGrid &cells, const int randomSeed, const dimensions_t cellPixelSize, const uint8_t rulePriority, const uint8_t runSettings) const
 {
    if (tileIds.size() == 0)
    {
@@ -326,10 +326,49 @@ void Rule::applyRule(
          ruleLog.matchedCells.push_back(DebugMatchCell{ cellX, cellY, 0, "success" });
 #endif
 
+         // -----------------------------------------------------
+         // Compute position offsets
+
+         int cellXOffset = 0;
+         int8_t excessPixelPosXOffset = 0;
+         int16_t finalXOffset = GridUtility::getRandomIndex(randomSeed + uid, cellX, cellY, randomPosXOffsetMin, randomPosXOffsetMax) + posXOffset;
+         if (finalXOffset != 0)
+         {
+            // convert pixel values to cell values, add that to the locationX,
+            // and any excess value will be stored in excessPixelPosXOffset
+            cellXOffset = finalXOffset / cellPixelSize;
+            excessPixelPosXOffset = finalXOffset % cellPixelSize;
+         }
+
+         int cellYOffset = 0;
+         int8_t excessPixelPosYOffset = 0;
+         int16_t finalYOffset = GridUtility::getRandomIndex(randomSeed + uid + 1, cellX, cellY, randomPosYOffsetMin, randomPosYOffsetMax) + posYOffset;
+         if (finalYOffset != 0)
+         {
+            // convert pixel values to cell values, add that to the locationY,
+            // and any excess value will be stored in excessPixelPosYOffset
+            cellYOffset = finalYOffset / cellPixelSize;
+            excessPixelPosYOffset = finalYOffset % cellPixelSize;
+         }
+
+         // -----------------------------------------------------
+
          switch (tileMode)
          {
             case TileMode::Single:
             {
+               int locationX = cellX + cellXOffset;
+               int locationY = cellY + cellYOffset;
+
+               if (locationX < 0 || locationX >= cells.getWidth() || locationY < 0 || locationY >= cells.getHeight())
+               {
+                  // Tile went over the map (probably due to offsets), skip it.
+                  // This is fine, since that tile is effectively at off-screen area.
+                  break;
+               }
+
+               // -----------------------------------------------------
+
                // choose one tile at random
                tileid_t tileId;
                if (tileIds.size() > 1)
@@ -344,10 +383,10 @@ void Rule::applyRule(
                uint8_t flags = static_cast<uint8_t>(ruleMatchResult) | breakOnMatchFlag;
 
 #if !defined(NDEBUG) && LDTK_IMPORT_DEBUG_RULE > 0
-               tileGridLog[GridUtility::getIndex(cellX, cellY, cells.getWidth())].push_back(uid);
+               tileGridLog[GridUtility::getIndex(locationX, locationY, cells.getWidth())].push_back(uid);
 #endif
 
-               tileGrid.putTile(tileId, cellX, cellY, flags, rulePriority);
+               tileGrid.putTile(tileId, locationX, locationY, excessPixelPosXOffset, excessPixelPosYOffset, flags, rulePriority);
                break;
             }
             case TileMode::Stamp:
@@ -359,6 +398,19 @@ void Rule::applyRule(
                for (size_t tileIdx = 0, tileLen = tileIds.size(); tileIdx < tileLen; ++tileIdx)
                {
                   const Rule::Offset &offset = stampTileOffsets[tileIdx];
+
+                  int locationX = cellX + cellXOffset + (offset.x * (TileFlags::isFlippedX(ruleMatchResult) ? -1 : 1));
+                  int locationY = cellY + cellYOffset + (offset.y * (TileFlags::isFlippedY(ruleMatchResult) ? -1 : 1));
+
+                  if (locationX < 0 || locationX >= cells.getWidth() || locationY < 0 || locationY >= cells.getHeight())
+                  {
+                     // Tile of stamp went over the map, skip it.
+                     // It's ok if part of the stamp is cut-off,
+                     // since that part is effectively at off-screen area.
+                     continue;
+                  }
+
+                  // -----------------------------------------------------
 
                   uint8_t flags;
                   bool giveBreakOnMatch;
@@ -381,16 +433,6 @@ void Rule::applyRule(
                   {
                      // do not finalize for cells that aren't the current one
                      flags = static_cast<uint8_t>(ruleMatchResult) | offset.flags;
-                  }
-
-                  int locationX = cellX + (offset.x * (tile::isFlippedX(flags) ? -1 : 1));
-                  int locationY = cellY + (offset.y * (tile::isFlippedY(flags) ? -1 : 1));
-                  if (locationX < 0 || locationX >= cells.getWidth() || locationY < 0 || locationY >= cells.getHeight())
-                  {
-                     // Tile of stamp went over the map, skip it.
-                     // It's ok if part of the stamp is cut-off,
-                     // since that part is effectively at off-screen area.
-                     continue;
                   }
 
                   // If we have left offset, check if (locationX-1, locationY) has a higher priority rule placed on it.
@@ -416,7 +458,7 @@ void Rule::applyRule(
                   tileGridLog[GridUtility::getIndex(locationX, locationY, cells.getWidth())].push_back(uid);
 #endif
 
-                  tileGrid.putTile(tileIds[tileIdx], locationX, locationY, flags, rulePriority);
+                  tileGrid.putTile(tileIds[tileIdx], locationX, locationY, excessPixelPosXOffset, excessPixelPosYOffset, flags, rulePriority);
                } // for tileId
                break;
             }

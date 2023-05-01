@@ -152,6 +152,12 @@ public:
       breakOnMatch(true),
       flipX(false),
       flipY(false),
+      posXOffset(0),
+      posYOffset(0),
+      randomPosXOffsetMin(0),
+      randomPosXOffsetMax(0),
+      randomPosYOffsetMin(0),
+      randomPosYOffsetMax(0),
       xModulo(1),
       xModuloOffset(0),
       yModulo(1),
@@ -186,6 +192,17 @@ public:
          return false;
       }
 
+      if (randomPosXOffsetMin > randomPosXOffsetMax)
+      {
+         std::cout << "rule " << uid << " not valid due to randomPosXOffset's min being greater than max. min: " << randomPosXOffsetMin << " max: " << randomPosXOffsetMax << std::endl;
+         return false;
+      }
+      if (randomPosYOffsetMin > randomPosYOffsetMax)
+      {
+         std::cout << "rule " << uid << " not valid due to randomPosYOffset's min being greater than max. min: " << randomPosYOffsetMin << " max: " << randomPosYOffsetMax << std::endl;
+         return false;
+      }
+
       // passed all checks
       return true;
    }
@@ -206,7 +223,7 @@ public:
 #if !defined(NDEBUG) && LDTK_IMPORT_DEBUG_RULE > 0
       RuleLog &ruleLog, RulesLog::RulesInGrid_t &tileGridLog,
 #endif
-      TileGrid &tileGrid, const IntGrid &cells, const int randomSeed, const uint8_t rulePriority, const uint8_t runSettings) const;
+      TileGrid &tileGrid, const IntGrid &cells, const int randomSeed, const dimensions_t cellPixelSize,  const uint8_t rulePriority, const uint8_t runSettings) const;
 
    /**
     *  @brief Unique identifier for this rule. Also contributes to the seed in pseudo-random number checks.
@@ -256,6 +273,80 @@ public:
     *  @see https://ldtk.io/json/#ldtk-AutoRuleDef;flipY
     */
    bool flipY;
+
+   /**
+    *  @brief After tile has been placed by this rule, we move it horizontally
+    *  by this amount (in pixels).
+    *  For stamp tiles, this offset is done after the stampTileOffsets.
+    *
+    *  Added in v1.3.0.
+    *
+    *  @see https://ldtk.io/json/#ldtk-AutoRuleDef;tileXOffset
+    */
+   int16_t posXOffset;
+
+   /**
+    *  @brief After tile has been placed by this rule, we move it vertically
+    *  by this amount (in pixels). Negative values move up, positive values move down.
+    *  For stamp tiles, this offset is done after the stampTileOffsets.
+    *
+    *  Added in v1.3.0.
+    *
+    *  @see https://ldtk.io/json/#ldtk-AutoRuleDef;tileYOffset
+    */
+   int16_t posYOffset;
+
+   /**
+    *  @brief After tile has been placed by this rule, we move it horizontally
+    *  by a random amount (in pixels) with this value as the minimum.
+    *  For stamp tiles, this offset is done after the stampTileOffsets.
+    *
+    *  The LDtk editor ensures this value is <= randomPosXOffsetMax.
+    *
+    *  Added in v1.3.0.
+    *
+    *  @see https://ldtk.io/json/#ldtk-AutoRuleDef;tileRandomXMin
+    */
+   int16_t randomPosXOffsetMin;
+
+   /**
+    *  @brief After tile has been placed by this rule, we move it horizontally
+    *  by a random amount (in pixels) with this value as the maximum.
+    *  For stamp tiles, this offset is done after the stampTileOffsets.
+    *
+    *  The LDtk editor ensures this value is >= randomPosXOffsetMin.
+    *
+    *  Added in v1.3.0.
+    *
+    *  @see https://ldtk.io/json/#ldtk-AutoRuleDef;tileRandomXMax
+    */
+   int16_t randomPosXOffsetMax;
+
+   /**
+    *  @brief After tile has been placed by this rule, we move it vertically
+    *  by a random amount (in pixels) with this value as the minimum.
+    *  For stamp tiles, this offset is done after the stampTileOffsets.
+    *
+    *  The LDtk editor ensures this value is <= randomPosYOffsetMax.
+    *
+    *  Added in v1.3.0.
+    *
+    *  @see https://ldtk.io/json/#ldtk-AutoRuleDef;tileRandomYMin
+    */
+   int16_t randomPosYOffsetMin;
+
+   /**
+    *  @brief After tile has been placed by this rule, we move it vertically
+    *  by a random amount (in pixels) with this value as the maximum.
+    *  For stamp tiles, this offset is done after the stampTileOffsets.
+    *
+    *  The LDtk editor ensures this value is >= randomPosYOffsetMin.
+    *
+    *  Added in v1.3.0.
+    *
+    *  @see https://ldtk.io/json/#ldtk-AutoRuleDef;tileRandomYMax
+    */
+   int16_t randomPosYOffsetMax;
 
    /**
     *  @brief Check for cells to match at every nth column only.
@@ -575,6 +666,9 @@ inline std::ostream &operator<<(std::ostream &os, const Rule &rule)
    os << "Break on match: " << toYesNo(rule.breakOnMatch) << std::endl;
    os << "Flip X: " << toYesNo(rule.flipX) << std::endl;
    os << "Flip Y: " << toYesNo(rule.flipY) << std::endl;
+   os << "Pos Offset: (" << std::showpos << rule.posXOffset << ", " << rule.posYOffset << ")" << std::noshowpos << std::endl;
+   os << "Pos X Random Offset: " << rule.randomPosXOffsetMin << " to " << rule.randomPosXOffsetMax << std::endl;
+   os << "Pos Y Random Offset: " << rule.randomPosYOffsetMin << " to " << rule.randomPosYOffsetMax << std::endl;
    os << "Modulo X: " << rule.xModulo << std::endl;
    os << "Modulo Y: " << rule.yModulo << std::endl;
    os << "Modulo X Offset: " << rule.xModuloOffset << std::endl;

@@ -420,10 +420,9 @@ void LdtkDefFile::loadFromText(
 
             newRule.flipX = yyjson_obj_get_bool(autoRule, "flipX");
             newRule.flipY = yyjson_obj_get_bool(autoRule, "flipY");
+
             newRule.xModulo = yyjson_obj_get_int(autoRule, "xModulo");
             newRule.yModulo = yyjson_obj_get_int(autoRule, "yModulo");
-            newRule.xModuloOffset = yyjson_obj_get_int(autoRule, "xOffset");
-            newRule.yModuloOffset = yyjson_obj_get_int(autoRule, "yOffset");
 
             // modulo values are used as divisors, so they shouldn't be 0
             // there's also no point in them being negative
@@ -434,6 +433,19 @@ void LdtkDefFile::loadFromText(
             if (newRule.yModulo < 1)
             {
                newRule.yModulo = 1;
+            }
+
+            newRule.xModuloOffset = yyjson_obj_get_int(autoRule, "xOffset");
+            newRule.yModuloOffset = yyjson_obj_get_int(autoRule, "yOffset");
+
+            if (isVersionAtLeast(1, 3, 0))
+            {
+               newRule.posXOffset = yyjson_obj_get_int(autoRule, "tileXOffset");
+               newRule.posYOffset = yyjson_obj_get_int(autoRule, "tileYOffset");
+               newRule.randomPosXOffsetMin = yyjson_obj_get_int(autoRule, "tileRandomXMin");
+               newRule.randomPosXOffsetMax = yyjson_obj_get_int(autoRule, "tileRandomXMax");
+               newRule.randomPosYOffsetMin = yyjson_obj_get_int(autoRule, "tileRandomYMin");
+               newRule.randomPosYOffsetMax = yyjson_obj_get_int(autoRule, "tileRandomYMax");
             }
 
             auto checkerString = yyjson_obj_get_str(autoRule, "checker");
@@ -960,7 +972,7 @@ void LdtkDefFile::runRulesOnLayer(
 #if !defined(NDEBUG) && LDTK_IMPORT_DEBUG_RULE > 0
             rulesLog.rule[rule->uid], rulesLog.tileGrid[layerIdx],
 #endif
-            tileGrid, intGrid, tileGrid.getRandomSeed(), rulePriority, runSettings);
+            tileGrid, intGrid, randomSeed, layer.cellPixelSize, rulePriority, runSettings);
 
          ++rulePriority;
       } // for Rule
