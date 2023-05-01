@@ -5,7 +5,8 @@
 LdtkImport is an MIT-licensed C++ library for importing a subset of [.ldtk file](https://ldtk.io/json/) data. It specifically imports [Auto-layers](https://ldtk.io/docs/general/auto-layers/) and its [Rules](https://ldtk.io/docs/general/auto-layers/auto-layer-rules/), then performs the rule pattern matching process to allow dynamically creating new levels during runtime.
 
 * Engine-agnostic: This is a bare-bones implementation that will only load the data. When it runs the rule matching process, its output is also only just data. The only dependency it has is [yyjson](https://github.com/ibireme/yyjson) for parsing the ldtk file's json text.
-* A separate [git repo](https://github.com/AnomalousUnderdog/ldtkimport-demo) uses this library as an example.
+* Lightweight: This library aims to be as computationally lightweight as it reasonably can, as it is intended for a 3DS homebrew hobby project (but it's also meant to work for a regular desktop environment).
+* A separate [git repo](https://github.com/AnomalousUnderdog/ldtkimport-demo) uses SFML to demo this library as an example. Demo can be downloaded from [here](https://github.com/AnomalousUnderdog/ldtkimport-demo/releases/latest).
 
 
 # Motivation
