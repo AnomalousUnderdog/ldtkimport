@@ -93,6 +93,12 @@ struct RulesLog
    using RulesInCell_t = std::vector<uid_t>; // stack of rule uids, shows which rules were applied to this cell
    using RulesInGrid_t = std::vector<RulesInCell_t>; // 2d grid packed in 1d vector, this is the tilegrid
    std::vector<RulesInGrid_t> tileGrid; // collection of tilegrids (per layer)
+
+   void clear()
+   {
+      rule.clear();
+      tileGrid.clear();
+   }
 };
 
 inline std::ostream &operator<<(std::ostream &os, const RuleLog &rule)

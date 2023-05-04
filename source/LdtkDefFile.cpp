@@ -61,64 +61,60 @@ void LdtkDefFile::setLayerInitialSeed(int layerDefUid, int newInitialSeed)
    }
 }
 
-bool LdtkDefFile::getTileset(int tilesetDefUid, TileSet *&result)
+TileSet *LdtkDefFile::getTileset(int tilesetDefUid)
 {
    for (auto i = m_tilesets.data(), end = m_tilesets.data() + m_tilesets.size(); i != end; ++i)
    {
       if (i->uid == tilesetDefUid)
       {
-         result = i;
-         return true;
+         return i;
       }
    }
 
-   return false;
+   return nullptr;
 }
 
-bool LdtkDefFile::getTileset(int tilesetDefUid, const TileSet *&result) const
+const TileSet *LdtkDefFile::getTileset(int tilesetDefUid) const
 {
    for (auto i = m_tilesets.data(), end = m_tilesets.data() + m_tilesets.size(); i != end; ++i)
    {
       if (i->uid == tilesetDefUid)
       {
-         result = i;
-         return true;
+         return i;
       }
    }
 
-   return false;
+   return nullptr;
 }
 
-bool LdtkDefFile::getLayer(int layerDefUid, Layer *&result)
+Layer *LdtkDefFile::getLayerByUid(int layerDefUid)
 {
    for (auto i = m_layers.data(), end = m_layers.data() + m_layers.size(); i != end; ++i)
    {
       if (i->uid == layerDefUid)
       {
-         result = i;
-         return true;
+         return i;
       }
    }
 
-   return false;
+   return nullptr;
 }
 
-bool LdtkDefFile::getLayer(int layerDefUid, const Layer *&result) const
+const Layer *LdtkDefFile::getLayerByUid(int layerDefUid) const
 {
    for (auto i = m_layers.cbegin(), end = m_layers.cend(); i != end; ++i)
    {
       if (i->uid == layerDefUid)
       {
-         result = &*i;
-         return true;
+         return &*i;
       }
    }
 
-   return false;
+   return nullptr;
 }
 
 
-bool LdtkDefFile::getRuleGroupOfRule(int ruleUid, const RuleGroup *&result) const
+const RuleGroup *LdtkDefFile::getRuleGroupOfRule(int ruleUid) const
 {
    for (auto i = m_layers.cbegin(), end = m_layers.cend(); i != end; ++i)
    {
@@ -128,14 +124,13 @@ bool LdtkDefFile::getRuleGroupOfRule(int ruleUid, const RuleGroup *&result) cons
          {
             if (rule->uid == ruleUid)
             {
-               result = &*r;
-               return true;
+               return &*r;
             }
          }
       }
    }
 
-   return false;
+   return nullptr;
 }
 
 #define USE_IFSTREAM
@@ -622,8 +617,8 @@ void LdtkDefFile::preProcess(
 
    for (auto layer = m_layers.begin(), layerEnd = m_layers.end(); layer != layerEnd; ++layer)
    {
-      TileSet *tileset = nullptr;
-      if (!getTileset(layer->tilesetDefUid, tileset))
+      TileSet *tileset = getTileset(layer->tilesetDefUid);
+      if (tileset == nullptr)
       {
          // can't find tileset for this layer
          continue;
@@ -921,7 +916,7 @@ void LdtkDefFile::runRulesOnLayer(
 {
    auto &intGrid = level.getIntGrid();
    auto &layer = m_layers[layerIdx];
-   auto &tileGrid = level.getTileGrid(layerIdx);
+   auto &tileGrid = level.getTileGridByIdx(layerIdx);
 
    tileGrid.setRandomSeed(randomSeed);
    tileGrid.setLayerUid(layer.uid);

@@ -41,21 +41,21 @@ TEST_CASE("Rule Test", "[Rule]")
    rule1.tileIds = { 1337 };
 
 #if !defined(NDEBUG) && LDTK_IMPORT_DEBUG_RULE > 0
-   RuleLogs_t rulesLog;
+   RulesLog rulesLog;
 #endif
 
    for (int n = 0; n < 10; ++n)
    {
-      def.generate(
+      def.runRules(
 #if !defined(NDEBUG) && LDTK_IMPORT_DEBUG_RULE > 0
          rulesLog,
 #endif
-         level, true);
+         level);
    }
 
    REQUIRE(level.getTileGridCount() == 1);
 
-   const TileGrid &tileGrid = level.getTileGrid(0);
+   const TileGrid &tileGrid = level.getTileGridByIdx(0);
 
    REQUIRE(tileGrid.getTileIdDebugString() == R"(
 [], [], [], [], []
@@ -113,7 +113,7 @@ TEST_CASE("Tile Stamp", "[Rule]")
 
 
 #if !defined(NDEBUG) && LDTK_IMPORT_DEBUG_RULE > 0
-   RuleLogs_t rulesLog;
+   RulesLog rulesLog;
 #endif
 
    WHEN("Stamp is anchored at bottom-center")
@@ -126,7 +126,7 @@ TEST_CASE("Tile Stamp", "[Rule]")
 #endif
       );
 
-      def.generate(
+      def.runRules(
 #if !defined(NDEBUG) && LDTK_IMPORT_DEBUG_RULE > 0
          rulesLog,
 #endif
@@ -135,7 +135,7 @@ TEST_CASE("Tile Stamp", "[Rule]")
       THEN("Results should be at bottom-center")
       {
          REQUIRE(level.getTileGridCount() == 1);
-         const TileGrid &tileGrid = level.getTileGrid(0);
+         const TileGrid &tileGrid = level.getTileGridByIdx(0);
 
          REQUIRE(tileGrid.getTileIdDebugString() == R"(
 [0], [1, 0], [2, 1, 0], [2, 1], [2]
@@ -159,7 +159,7 @@ TEST_CASE("Tile Stamp", "[Rule]")
 #endif
       );
 
-      def.generate(
+      def.runRules(
 #if !defined(NDEBUG) && LDTK_IMPORT_DEBUG_RULE > 0
          rulesLog,
 #endif
@@ -168,7 +168,7 @@ TEST_CASE("Tile Stamp", "[Rule]")
       THEN("Results should be at bottom-right")
       {
          REQUIRE(level.getTileGridCount() == 1);
-         const TileGrid &tileGrid = level.getTileGrid(0);
+         const TileGrid &tileGrid = level.getTileGridByIdx(0);
 
          REQUIRE(tileGrid.getTileIdDebugString() == R"(
 [1, 0], [2, 1, 0], [2, 1], [2], []
@@ -192,7 +192,7 @@ TEST_CASE("Tile Stamp", "[Rule]")
 #endif
       );
 
-      def.generate(
+      def.runRules(
 #if !defined(NDEBUG) && LDTK_IMPORT_DEBUG_RULE > 0
          rulesLog,
 #endif
@@ -201,9 +201,9 @@ TEST_CASE("Tile Stamp", "[Rule]")
       THEN("Results should be at bottom-left")
       {
          REQUIRE(level.getTileGridCount() == 1);
-         const TileGrid &tileGrid = level.getTileGrid(0);
+         const TileGrid &tileGrid = level.getTileGridByIdx(0);
 
-         std::cout << "Bottom-left anchor:" << std::endl << rulesLog[0] << std::endl;
+         std::cout << "Bottom-left anchor:" << std::endl << rulesLog.rule[0] << std::endl;
 
          REQUIRE(tileGrid.getTileIdDebugString() == R"(
 [], [0], [1, 0], [2, 1, 0], [2, 1]
@@ -241,7 +241,7 @@ TEST_CASE("Rule with modulo", "[Rule]")
    rule1.tileIds = { 9 };
 
 #if !defined(NDEBUG) && LDTK_IMPORT_DEBUG_RULE > 0
-   RuleLogs_t rulesLog;
+   RulesLog rulesLog;
 #endif
 
    WHEN("Modulo is 2,1")
@@ -254,7 +254,7 @@ TEST_CASE("Rule with modulo", "[Rule]")
          REQUIRE(def.isValid());
       }
 
-      def.generate(
+      def.runRules(
 #if !defined(NDEBUG) && LDTK_IMPORT_DEBUG_RULE > 0
          rulesLog,
 #endif
@@ -265,7 +265,7 @@ TEST_CASE("Rule with modulo", "[Rule]")
       THEN("Result should skip horizontal")
       {
          REQUIRE(level.getTileGridCount() == 1);
-         const TileGrid &tileGrid = level.getTileGrid(0);
+         const TileGrid &tileGrid = level.getTileGridByIdx(0);
 
          REQUIRE(tileGrid.getTileIdDebugString() == R"(
 [9], [], [9]
@@ -285,7 +285,7 @@ TEST_CASE("Rule with modulo", "[Rule]")
          REQUIRE(def.isValid());
       }
 
-      def.generate(
+      def.runRules(
 #if !defined(NDEBUG) && LDTK_IMPORT_DEBUG_RULE > 0
          rulesLog,
 #endif
@@ -296,7 +296,7 @@ TEST_CASE("Rule with modulo", "[Rule]")
       THEN("Result should skip vertical")
       {
          REQUIRE(level.getTileGridCount() == 1);
-         const TileGrid &tileGrid = level.getTileGrid(0);
+         const TileGrid &tileGrid = level.getTileGridByIdx(0);
 
          REQUIRE(tileGrid.getTileIdDebugString() == R"(
 [9], [9], [9]
@@ -317,7 +317,7 @@ TEST_CASE("Rule with modulo", "[Rule]")
          REQUIRE(def.isValid());
       }
 
-      def.generate(
+      def.runRules(
 #if !defined(NDEBUG) && LDTK_IMPORT_DEBUG_RULE > 0
          rulesLog,
 #endif
@@ -326,7 +326,7 @@ TEST_CASE("Rule with modulo", "[Rule]")
       THEN("Result should be checkered")
       {
          REQUIRE(level.getTileGridCount() == 1);
-         const TileGrid &tileGrid = level.getTileGrid(0);
+         const TileGrid &tileGrid = level.getTileGridByIdx(0);
 
          REQUIRE(tileGrid.getTileIdDebugString() == R"(
 [9], [], [9]
@@ -347,7 +347,7 @@ TEST_CASE("Rule with modulo", "[Rule]")
          REQUIRE(def.isValid());
       }
 
-      def.generate(
+      def.runRules(
 #if !defined(NDEBUG) && LDTK_IMPORT_DEBUG_RULE > 0
          rulesLog,
 #endif
@@ -356,7 +356,7 @@ TEST_CASE("Rule with modulo", "[Rule]")
       THEN("Result should be checkered")
       {
          REQUIRE(level.getTileGridCount() == 1);
-         const TileGrid &tileGrid = level.getTileGrid(0);
+         const TileGrid &tileGrid = level.getTileGridByIdx(0);
 
          REQUIRE(tileGrid.getTileIdDebugString() == R"(
 [9], [], [9]
@@ -377,7 +377,7 @@ TEST_CASE("Rule with modulo", "[Rule]")
          REQUIRE(def.isValid());
       }
 
-      def.generate(
+      def.runRules(
 #if !defined(NDEBUG) && LDTK_IMPORT_DEBUG_RULE > 0
          rulesLog,
 #endif
@@ -388,7 +388,7 @@ TEST_CASE("Rule with modulo", "[Rule]")
       THEN("Result should not checker")
       {
          REQUIRE(level.getTileGridCount() == 1);
-         const TileGrid &tileGrid = level.getTileGrid(0);
+         const TileGrid &tileGrid = level.getTileGridByIdx(0);
 
          REQUIRE(tileGrid.getTileIdDebugString() == R"(
 [9], [], [9]
@@ -409,7 +409,7 @@ TEST_CASE("Rule with modulo", "[Rule]")
          REQUIRE(def.isValid());
       }
 
-      def.generate(
+      def.runRules(
 #if !defined(NDEBUG) && LDTK_IMPORT_DEBUG_RULE > 0
          rulesLog,
 #endif
@@ -420,7 +420,7 @@ TEST_CASE("Rule with modulo", "[Rule]")
       THEN("Result should not checker")
       {
          REQUIRE(level.getTileGridCount() == 1);
-         const TileGrid &tileGrid = level.getTileGrid(0);
+         const TileGrid &tileGrid = level.getTileGridByIdx(0);
 
          REQUIRE(tileGrid.getTileIdDebugString() == R"(
 [9], [9], [9]
@@ -441,13 +441,13 @@ TEST_CASE("Rule with modulo", "[Rule]")
          REQUIRE(def.isValid() == false);
 
 #if !defined(NDEBUG) && LDTK_IMPORT_DEBUG_RULE > 0
-         REQUIRE_THROWS_MATCHES(def.generate(rulesLog, level), std::logic_error, MessageMatches(ContainsSubstring("divisor is zero")));
+         REQUIRE_THROWS_MATCHES(def.runRules(rulesLog, level), std::logic_error, MessageMatches(ContainsSubstring("divisor is zero")));
 #else
-         REQUIRE_THROWS_MATCHES(def.generate(level), std::logic_error, MessageMatches(ContainsSubstring("divisor is zero")));
+         REQUIRE_THROWS_MATCHES(def.runRules(level), std::logic_error, MessageMatches(ContainsSubstring("divisor is zero")));
 #endif
 
          REQUIRE(level.getTileGridCount() == 1);
-         const TileGrid &tileGrid = level.getTileGrid(0);
+         const TileGrid &tileGrid = level.getTileGridByIdx(0);
 
          REQUIRE(tileGrid.getTileIdDebugString() == R"(
 [], [], []
@@ -467,13 +467,13 @@ TEST_CASE("Rule with modulo", "[Rule]")
          REQUIRE(def.isValid() == false);
 
 #if !defined(NDEBUG) && LDTK_IMPORT_DEBUG_RULE > 0
-         REQUIRE_THROWS_MATCHES(def.generate(rulesLog, level), std::logic_error, MessageMatches(ContainsSubstring("divisor is zero")));
+         REQUIRE_THROWS_MATCHES(def.runRules(rulesLog, level), std::logic_error, MessageMatches(ContainsSubstring("divisor is zero")));
 #else
-         REQUIRE_THROWS_MATCHES(def.generate(level), std::logic_error, MessageMatches(ContainsSubstring("divisor is zero")));
+         REQUIRE_THROWS_MATCHES(def.runRules(level), std::logic_error, MessageMatches(ContainsSubstring("divisor is zero")));
 #endif
 
          REQUIRE(level.getTileGridCount() == 1);
-         const TileGrid &tileGrid = level.getTileGrid(0);
+         const TileGrid &tileGrid = level.getTileGridByIdx(0);
 
          REQUIRE(tileGrid.getTileIdDebugString() == R"(
 [], [], []
@@ -494,13 +494,13 @@ TEST_CASE("Rule with modulo", "[Rule]")
          REQUIRE(def.isValid() == false);
 
 #if !defined(NDEBUG) && LDTK_IMPORT_DEBUG_RULE > 0
-         REQUIRE_THROWS_MATCHES(def.generate(rulesLog, level), std::logic_error, MessageMatches(ContainsSubstring("divisor is zero")));
+         REQUIRE_THROWS_MATCHES(def.runRules(rulesLog, level), std::logic_error, MessageMatches(ContainsSubstring("divisor is zero")));
 #else
-         REQUIRE_THROWS_MATCHES(def.generate(level), std::logic_error, MessageMatches(ContainsSubstring("divisor is zero")));
+         REQUIRE_THROWS_MATCHES(def.runRules(level), std::logic_error, MessageMatches(ContainsSubstring("divisor is zero")));
 #endif
 
          REQUIRE(level.getTileGridCount() == 1);
-         const TileGrid &tileGrid = level.getTileGrid(0);
+         const TileGrid &tileGrid = level.getTileGridByIdx(0);
 
          REQUIRE(tileGrid.getTileIdDebugString() == R"(
 [], [], []

@@ -34,6 +34,9 @@ public:
       m_filename(),
       m_projectUniqueId(),
       m_fileVersion(),
+      m_versionMajor(-1),
+      m_versionMinor(-1),
+      m_versionPatch(-1),
       m_bgColor(),
       m_bgColor8(),
       m_bgColorf(),
@@ -150,42 +153,37 @@ public:
    /**
     *  @brief Find a TileSet with the given unique id.
     *  @param[in] tilesetDefUid Unique id of the TileSet to get.
-    *  @param[out] result Where the found TileSet will be in, if any. Use the return value to check.
-    *  @return true means the Layer was found, false if not.
+    *  @return Pointer to the found TileSet, or nullptr if not found.
     */
-   bool getTileset(int tilesetDefUid, TileSet *&result);
+   TileSet *getTileset(int tilesetDefUid);
 
    /**
     *  @brief Find a TileSet with the given unique id (const version).
     *  @param[in] tilesetDefUid Unique id of the TileSet to get.
-    *  @param[out] result Where the found TileSet will be in, if any. Use the return value to check.
-    *  @return true means the Layer was found, false if not.
+    *  @return Pointer to the found TileSet, or nullptr if not found.
     */
-   bool getTileset(int tilesetDefUid, const TileSet *&result) const;
+   const TileSet *getTileset(int tilesetDefUid) const;
 
    /**
     *  @brief Find a Layer with the given unique id.
     *  @param[in] layerDefUid Unique id of the Layer to get.
-    *  @param[out] result Where the found Layer will be in, if any. Use the return value to check.
-    *  @return true means the Layer was found, false if not.
+    *  @return Pointer to the found Layer, or nullptr if not found.
     */
-   bool getLayer(int layerDefUid, Layer *&result);
+   Layer *getLayerByUid(int layerDefUid);
 
    /**
     *  @brief Find a Layer with the given unique id (const version).
     *  @param[in] layerDefUid Unique id of the Layer to get.
-    *  @param[out] result Where the found Layer will be in, if any. Use the return value to check.
-    *  @return true means the Layer was found, false if not.
+    *  @return Pointer to the found Layer, or nullptr if not found.
     */
-   bool getLayer(int layerDefUid, const Layer *&result) const;
+   const Layer *getLayerByUid(int layerDefUid) const;
 
    /**
     *  @brief Get the RuleGroup that owns the specified Rule. This will search through all Layers.
     *  @param[in] ruleUid Unique id of the Rule.
-    *  @param[out] result Where the found RuleGroup will be in, if any. Use the return value to check.
-    *  @return true means the RuleGroup was found, false if not.
+    *  @return Pointer to the found RuleGroup, or nullptr if not found.
     */
-   bool getRuleGroupOfRule(int ruleUid, const RuleGroup *&result) const;
+   const RuleGroup *getRuleGroupOfRule(int ruleUid) const;
 
    // ---------------------------------------------------------------------
    // Note: These next set of functions are used for debugging, to
@@ -198,7 +196,7 @@ public:
       return m_layers.size();
    }
 
-   const Layer &getLayer(int layerIdx) const
+   const Layer &getLayerByIdx(int layerIdx) const
    {
       return m_layers[layerIdx];
    }
@@ -553,8 +551,8 @@ inline std::ostream &operator<<(std::ostream &os, const LdtkDefFile &ldtkFile)
       os << "  cellPixelSize: " << layer.cellPixelSize << std::endl;
       os << "  initialRandomSeed: " << layer.initialRandomSeed << std::endl;
 
-      const ldtkimport::TileSet *tileset = nullptr;
-      if (ldtkFile.getTileset(layer.tilesetDefUid, tileset))
+      const ldtkimport::TileSet *tileset = ldtkFile.getTileset(layer.tilesetDefUid);
+      if (tileset != nullptr)
       {
          os << "  tilesetDefUid: " << tileset->name << " (" << layer.tilesetDefUid << ")" << std::endl;
       }

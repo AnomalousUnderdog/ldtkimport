@@ -111,12 +111,12 @@ public:
       }
    }
 
-   TileGrid &getTileGrid(int idx)
+   TileGrid &getTileGridByIdx(int idx)
    {
       return m_tileGrids[idx];
    }
 
-   const TileGrid &getTileGrid(int idx) const
+   const TileGrid &getTileGridByIdx(int idx) const
    {
       return m_tileGrids[idx];
    }

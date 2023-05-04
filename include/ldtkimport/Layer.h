@@ -103,18 +103,17 @@ struct Layer
     *  @param[out] result Where the found IntGridValue will be.
     *  @return true if the IntGridValue was found, false if not.
     */
-   bool getIntGridValue(intgridvalue_t intGridValueId, const IntGridValue *&result) const
+   const IntGridValue *getIntGridValue(intgridvalue_t intGridValueId) const
    {
       for (auto i = intGridValues.cbegin(), end = intGridValues.cend(); i != end; ++i)
       {
          if (i->id == intGridValueId)
          {
-            result = &*i;
-            return true;
+            return &*i;
          }
       }
 
-      return false;
+      return nullptr;
    }
 };
 
