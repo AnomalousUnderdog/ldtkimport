@@ -152,6 +152,7 @@ public:
       breakOnMatch(true),
       flipX(false),
       flipY(false),
+      opacity(100),
       posXOffset(0),
       posYOffset(0),
       randomPosXOffsetMin(0),
@@ -273,6 +274,18 @@ public:
     *  @see https://ldtk.io/json/#ldtk-AutoRuleDef;flipY
     */
    bool flipY;
+
+   /**
+    *  @brief Opacity of the tiles when placed. Goes from 0 to 100,
+    *  though the LDtk editor enforces 1 as the minimum.
+    *  Note: In the LDtk editor, this is a floating-point that goes from 0.01 to 1.0,
+    *  so we just multiply that value by 100, to fit it into an 8-bit int.
+    *
+    *  Added in v1.3.1.
+    *
+    *  @see https://ldtk.io/json/#ldtk-AutoRuleDef;alpha
+    */
+   uint8_t opacity;
 
    /**
     *  @brief After tile has been placed by this rule, we move it horizontally

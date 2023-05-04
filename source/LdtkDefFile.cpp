@@ -405,6 +405,10 @@ void LdtkDefFile::loadFromText(
                newRule.tileIds.push_back(yyjson_get_int(tileId));
             }
 
+            if (isVersionAtLeast(1, 3, 1))
+            {
+               newRule.opacity = static_cast<uint8_t>(yyjson_obj_get_float(autoRule, "alpha") * 100);
+            }
 
             newRule.chance = yyjson_obj_get_float(autoRule, "chance");
             newRule.breakOnMatch = yyjson_obj_get_bool(autoRule, "breakOnMatch");

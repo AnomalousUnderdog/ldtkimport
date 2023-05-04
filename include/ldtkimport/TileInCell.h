@@ -20,15 +20,17 @@ struct TileInCell
       tileId(0),
       posXOffset(0),
       posYOffset(0),
+      opacity(100),
       flags(TileFlags::NoFlags),
       priority(0)
    {
    }
 
-   TileInCell(tileid_t newTileId, int8_t newPosXOffset, int8_t newPosYOffset, uint8_t newFlag, uint8_t newPriority) :
+   TileInCell(tileid_t newTileId, int8_t newPosXOffset, int8_t newPosYOffset, uint8_t newOpacity, uint8_t newFlag, uint8_t newPriority) :
       tileId(newTileId),
       posXOffset(newPosXOffset),
       posYOffset(newPosYOffset),
+      opacity(newOpacity),
       flags(newFlag),
       priority(newPriority)
    {
@@ -58,6 +60,11 @@ struct TileInCell
     *  positive values move the tile down.
     */
    int8_t posYOffset;
+
+   /**
+    *  @brief Opacity that tile should have when drawn. Goes from 0 to 100.
+    */
+   uint8_t opacity;
 
    /**
     *  @brief Various bool flags for how the tile is drawn.

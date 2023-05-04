@@ -386,7 +386,7 @@ void Rule::applyRule(
                tileGridLog[GridUtility::getIndex(locationX, locationY, cells.getWidth())].push_back(uid);
 #endif
 
-               tileGrid.putTile(tileId, locationX, locationY, excessPixelPosXOffset, excessPixelPosYOffset, flags, rulePriority);
+               tileGrid.putTile(tileId, locationX, locationY, excessPixelPosXOffset, excessPixelPosYOffset, opacity, flags, rulePriority);
                break;
             }
             case TileMode::Stamp:
@@ -458,7 +458,7 @@ void Rule::applyRule(
                   tileGridLog[GridUtility::getIndex(locationX, locationY, cells.getWidth())].push_back(uid);
 #endif
 
-                  tileGrid.putTile(tileIds[tileIdx], locationX, locationY, excessPixelPosXOffset, excessPixelPosYOffset, flags, rulePriority);
+                  tileGrid.putTile(tileIds[tileIdx], locationX, locationY, excessPixelPosXOffset, excessPixelPosYOffset, opacity, flags, rulePriority);
                } // for tileId
                break;
             }
