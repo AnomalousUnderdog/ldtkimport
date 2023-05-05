@@ -325,7 +325,15 @@ void LdtkDefFile::loadFromText(
       newLayer.name = yyjson_obj_get_str(layer, "identifier");
       newLayer.uid = yyjson_obj_get_int(layer, "uid");
       newLayer.cellPixelSize = yyjson_obj_get_int(layer, "gridSize");
-      newLayer.tilesetDefUid = yyjson_obj_get_int(layer, "tilesetDefUid");
+      auto tilesetDefUid = yyjson_obj_get(layer, "tilesetDefUid");
+      if (yyjson_is_null(tilesetDefUid))
+      {
+         newLayer.tilesetDefUid = 0;
+      }
+      else
+      {
+         newLayer.tilesetDefUid = yyjson_get_int(layer);
+      }
 
       auto layerAutoSourceLayerDefUid = yyjson_obj_get(layer, "autoSourceLayerDefUid");
       newLayer.useAutoSourceLayerDefUid = !yyjson_is_null(layerAutoSourceLayerDefUid);

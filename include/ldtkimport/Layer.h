@@ -57,7 +57,7 @@ struct Layer
    /**
     *  @brief Which tilesheet to use for this layer, referred to by their unique identifier.
     *  All rules under this layer will then use the specified tilesheet.
-    *  Corresponds to LdtkDefFile::TileSet::uid.
+    *  Corresponds to TileSet::uid.
     *
     *  @see https://ldtk.io/json/#ldtk-LayerDefJson;tilesetDefUid
     */
