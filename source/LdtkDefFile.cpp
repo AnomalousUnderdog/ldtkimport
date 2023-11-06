@@ -332,7 +332,7 @@ void LdtkDefFile::loadFromText(
       }
       else
       {
-         newLayer.tilesetDefUid = yyjson_get_int(layer);
+         newLayer.tilesetDefUid = yyjson_get_int(tilesetDefUid);
       }
 
       auto layerAutoSourceLayerDefUid = yyjson_obj_get(layer, "autoSourceLayerDefUid");
